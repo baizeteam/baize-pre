@@ -1,0 +1,56 @@
+{
+  "installs": [
+    {
+      "plugin": "prettier",
+      "config": {
+        "file": ".prettierrc",
+        "json": {
+          "printWidth": 80,
+          "tabWidth": 2,
+          "useTabs": false,
+          "singleQuote": false,
+          "semi": false,
+          "trailingComma": "none",
+          "bracketSpacing": true,
+          "htmlWhitespaceSensitivity": "ignore"
+        }
+      },
+      "dev": true,
+      "scripts": {
+        "key": "format",
+        "value": "prettier --write ."
+      }
+    },
+    {
+      "plugin": "husky",
+      "config": {
+        "file": ".husky/pre-commit",
+        "json": " #!/usr/bin/env sh \n . \"$(dirname -- \"$0\")/_/husky.sh\" \n npm run lint-staged "
+      },
+      "dev": true,
+      "scripts": {
+        "key": "lint-staged",
+        "value": "lint-staged"
+      }
+    },
+    {
+      "plugin": "typescript",
+      "config": {
+        "file": "tsconfig.json",
+        "json": {
+          "compilerOptions": {
+            "target": "es6",
+            "outDir": "bin",
+            "module": "esnext",
+            "esModuleInterop": true,
+            "moduleResolution": "node",
+            "rootDir": "src"
+          },
+          "include": ["src"],
+          "exclude": ["node_modules"]
+        }
+      },
+      "dev": true
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "name": "dog-pre1",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "format": "prettier --write .",
+    "lint-staged": "lint-staged"
+  },
+  "bin": {
+    "dog1": "/src/index.mjs"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/coderwhytop/dog-pre2"
+  },
+  "keywords": [
+    "front-end",
+    "basic",
+    "vue",
+    "react",
+    "angular"
+  ],
+  "author": "dog",
+  "license": "ISC",
+  "devDependencies": {
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.4",
+    "prettier": "^3.2.5"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "inquirer": "^8.2.6"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,json}": "prettier --write ."
+  }
+}
