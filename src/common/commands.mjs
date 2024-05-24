@@ -3,7 +3,7 @@ export const HUSKY = "husky"
 export const LINT = "lint-staged"
 export const TS = "typescript"
 // 命令相关
-export const mainCommand = "dog "
+export const mainCommand = "dog1 "
 const commands = {
   init: {
     alias: "ini",
@@ -27,14 +27,14 @@ const commands = {
       "Quickly install all plugins and config with your node version.",
     examples: [mainCommand + "all", mainCommand + "a"]
   },
-  config: {
-    alias: "conf",
-    description: "Configure the cli variable. Once config, use everywhere.",
-    examples: [
-      mainCommand + "config set <k> <v>",
-      mainCommand + "config get <k>"
-    ]
-  },
+  // config: {
+  //   alias: "conf",
+  //   description: "Configure the cli variable. Once config, use everywhere.",
+  //   examples: [
+  //     mainCommand + "config set <k> <v>",
+  //     mainCommand + "config get <k>"
+  //   ]
+  // },
   "*": {
     alias: "",
     description: "Command not found.",

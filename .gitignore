@@ -1,6 +1,3 @@
 .idea
 .vscode
-.hbuilder
-dist
-build
 node_modules

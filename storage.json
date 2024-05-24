@@ -16,9 +16,11 @@
         }
       },
       "dev": true,
-      "scripts": {
-        "key": "format",
-        "value": "prettier --write ."
+      "pkg": {
+        "scripts": {
+          "key": "format",
+          "value": "prettier --write ."
+        }
       }
     },
     {
@@ -28,9 +30,14 @@
         "json": " #!/usr/bin/env sh \n . \"$(dirname -- \"$0\")/_/husky.sh\" \n npm run lint-staged "
       },
       "dev": true,
-      "scripts": {
-        "key": "lint-staged",
-        "value": "lint-staged"
+      "pkg": {
+        "lint-staged": {
+          "**/*.{js,ts,json}": "prettier --write ."
+        },
+        "scripts":  {
+          "key": "lint-staged",
+          "value": "lint-staged"
+        }
       }
     },
     {
