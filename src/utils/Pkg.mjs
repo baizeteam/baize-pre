@@ -1,6 +1,11 @@
 import fs from "fs";
 import path from "path";
+import Tool from "./Tool.mjs";
 
+const tool = new Tool()
+function isObject (obj){
+    return Object.prototype.toString.call(obj) === '[object Object]'
+}
 // 用户的package.json
 class Pkg{
     constructor() {
@@ -9,23 +14,34 @@ class Pkg{
         this.dirPath = dirPath
     }
     get(){
+        const defaultInfo = {
+            scripts: {}
+        }
+        if(!fs.existsSync(this.path)) {
+            const filepath = this.path
+            tool.writeJSONFileSync(filepath, defaultInfo)
+            return defaultInfo
+        }
+        // 一定存在，且类型是字符串
+        let infoStr = fs.readFileSync(this.path, 'utf-8')
+        let info;
         try {
-            if(!fs.existsSync(this.path)) throw new Error('Error package.json path')
-            let info = JSON.parse(fs.readFileSync(this.path, 'utf-8'))
-            function isObject (obj){
-               return  Object.prototype.toString.call(obj) === '[object Object]'
+            info = JSON.parse(infoStr)
+            if(!isObject(info) || !isObject(info.scripts)){
+                this.update(defaultInfo)
+                return defaultInfo
             }
-            // 如果阅读的过程中，防止用户删除pkg, 如果不为对象设为{}
-            !isObject(info) || !isObject(info.script) && (info = {script : {}})
-            this.update(info)
+            // 能通过检测的原始info
             return info
         }catch (e){
-            throw new Error('Error: '+e)
+            // 如果json转换失败, 根本不可能是对象，直接给默认值
+            this.update(defaultInfo)
+            return defaultInfo
         }
     }
     update(content){
-        this.get(this.path) // 确保文件存在
-        fs.writeFileSync(this.path, JSON.stringify(content, null, 2))
+        const filepath = this.path
+        tool.writeJSONFileSync(filepath, content)
     }
 }
 

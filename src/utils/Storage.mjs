@@ -2,9 +2,10 @@ import Tool from "./Tool.mjs";
 import * as path from "path";
 import fs from "fs";
 
+const tool = new Tool()
 class Storage{
     constructor() {
-        const rootPath = new Tool().node._root
+        const rootPath = tool.node._root
         this.path = path.join(rootPath, 'storage.json')
     }
     get(){
@@ -17,8 +18,8 @@ class Storage{
     }
     update(content){
         // 不要提供全量更改
-        this.get(this.path) // 确保文件存在
-        fs.writeFileSync(this.path, JSON.stringify(content, null, 2))
+        const filepath = this.path
+        tool.writeJSONFileSync(filepath, content)
     }
 }
 

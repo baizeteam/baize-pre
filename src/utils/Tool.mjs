@@ -3,6 +3,7 @@ import { dirname } from "path"
 import * as path from "path";
 import chalk from "chalk";
 import {execSync} from 'child_process'
+import fs from "fs";
 
 const logger = function (type,s, bold){
     let color = 'yellow'
@@ -13,17 +14,27 @@ const logger = function (type,s, bold){
 }
 class Tool{
     constructor() {
+        this.initNode()
+    }
+    initNode(){
         const _filename = fileURLToPath(import.meta.url)
         const _dirname = dirname(_filename)
         const _root = path.join(_dirname, '..')
+        const version = process.versions.node
+        const versionPre = version.split('.')[0]
         this.node = {
             _filename,
             _dirname,
-            _root
+            _root,
+            version,
+            versionPre
         }
     }
     execSync(exec){
         execSync(exec, {stdio: 'inherit'})
+    }
+    writeJSONFileSync(path, content){
+        fs.writeFileSync(path, JSON.stringify(content, null,2))
     }
     getFileExt(path){
         // 使用lastIndexOf()找到最后一个'.'的位置

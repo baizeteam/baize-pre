@@ -18,8 +18,7 @@
       "dev": true,
       "pkg": {
         "scripts": {
-          "key": "format",
-          "value": "prettier --write ."
+          "format": "prettier --write ."
         }
       }
     },
@@ -34,9 +33,8 @@
         "lint-staged": {
           "**/*.{js,ts,json}": "prettier --write ."
         },
-        "scripts":  {
-          "key": "lint-staged",
-          "value": "lint-staged"
+        "scripts": {
+          "lint-staged": "lint-staged"
         }
       }
     },
