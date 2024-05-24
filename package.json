@@ -3,6 +3,7 @@
   "version": "0.1.1",
   "description": "",
   "scripts": {
+    "build": "nodemon",
     "format": "prettier --write .",
     "lint-staged": "lint-staged"
   },
@@ -38,7 +39,8 @@
   "dependencies": {
     "chalk": "^4.1.2",
     "commander": "^11.1.0",
-    "inquirer": "^8.2.6"
+    "inquirer": "^8.2.6",
+    "readline-sync": "^1.4.10"
   },
   "lint-staged": {
     "**/*.{js,ts,json}": "prettier --write ."

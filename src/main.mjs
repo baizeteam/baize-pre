@@ -1,26 +1,26 @@
 #!/usr/bin/env node
 import {program} from "commander"
 import * as fs from "fs";
-import logger from "./common/logger.mjs";
-import commands, {mainCommand} from "./common/commands.mjs"
+import Tool from "./utils/Tool.mjs";
+import Commands from "./common/Commands.mjs"
 import execs from "./exec/index.mjs";
 
-const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
-
 function main() {
+    const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
+    const commands = new Commands()
+    const commandResolves = commands.resolve()
     // 设置命令在前，选项在后
-    program.version(mainCommand.split(' ')[0] + '@' + pkg.version).usage('<command> [option]')
-    for (let key in commands) {
-        const {alias, description} = commands[key]
+    program.version(commands.main.split(' ')[0] + '@' + pkg.version).usage('<command> [option]')
+    for (let key in commandResolves) {
+        const {alias, description} = commandResolves[key]
         program
             .command(key) // 注册命令
             .alias(alias) // 配置命令别名
             .description(description) // 配置命令描述
             .action(function (name, {args}) {
                 // 除了上述的命令，其他统统匹配到这里
-                if (key === "*") return logger.error(description)
+                if (key === "*") return new Tool().error(description)
                 // console.log(process.cwd())
-                console.log(key, 'key')
                 execs[key](args)
             })
     }
