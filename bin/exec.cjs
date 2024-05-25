@@ -5381,8 +5381,8 @@ class Tool {
   error(s, bold) {
     return logger("error", s, bold)
   }
-  done(s){
-    this.success(commands.main + s + ' done. ',true);
+  done(s) {
+    this.success(commands.main + s + " done. ", true);
   }
 }
 
@@ -6829,7 +6829,7 @@ class Installer {
   handleConfig(config) {
     const filepath = path$1.join(this.pkg.dirPath, config.file);
     // console.log(config, "有注入配置", filepath)
-    console.log('注入配置',filepath);
+    console.log("注入配置", filepath);
     try {
       const { json } = config;
       if (typeof json === "object") tool$2.writeJSONFileSync(filepath, json);
@@ -6893,7 +6893,7 @@ async function all() {
   if (answer.toLowerCase() !== "n") {
     const installs = new Storage().get().installs;
     new Installer(installs);
-    tool.done('all');
+    tool.done("all");
   }
 }
 

@@ -68,7 +68,7 @@ class Installer {
   handleConfig(config) {
     const filepath = path.join(this.pkg.dirPath, config.file)
     // console.log(config, "有注入配置", filepath)
-    console.log('注入配置',filepath)
+    console.log("注入配置", filepath)
     try {
       const { json } = config
       if (typeof json === "object") tool.writeJSONFileSync(filepath, json)
