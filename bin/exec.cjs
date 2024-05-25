@@ -5288,82 +5288,81 @@ var source = chalk;
 
 var chalk$1 = /*@__PURE__*/getDefaultExportFromCjs(source);
 
-const logger = function (type,s, bold){
-    let color = 'yellow';
-    if(type === 'success') color = 'green';
-    else if(type === 'error') color = 'red';
-    const handler = bold ? chalk$1.bold[color](s) : chalk$1[color](s);
-    return console.log(handler)
+const logger = function (type, s, bold) {
+  let color = "yellow";
+  if (type === "success") color = "green";
+  else if (type === "error") color = "red";
+  const handler = bold ? chalk$1.bold[color](s) : chalk$1[color](s);
+  return console.log(handler)
 };
-class Tool{
-    constructor() {
-        this.initNode();
-    }
-    initNode(){
-        const _filename = url.fileURLToPath((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.src || new URL('exec.cjs', document.baseURI).href)));
-        const _dirname = path$1.dirname(_filename);
-        const _root = path__namespace.join(_dirname, '..');
-        const version = process.versions.node;
-        const versionPre = version.split('.')[0];
-        this.node = {
-            _filename,
-            _dirname,
-            _root,
-            version,
-            versionPre
-        };
-    }
-    execSync(exec){
-        require$$1.execSync(exec, {stdio: 'inherit'});
-    }
-    writeJSONFileSync(path, content){
-        fs$1.writeFileSync(path, JSON.stringify(content, null,2));
-    }
-    getFileExt(path){
-        // 使用lastIndexOf()找到最后一个'.'的位置
-        const dotIndex = path.lastIndexOf('.');
-        // 如果'.'不存在于路径中，则返回空字符串
-        if (dotIndex === -1) throw new Error('The filepath "' + path + ' " without extension.')
-        // 使用slice()方法获取从最后一个'.'到字符串末尾的部分
-        return path.slice(dotIndex + 1);
-    }
-    success(s, bold) {
-        return logger('success', s, bold)
-    }
-    warn(s, bold) {
-        return logger('warn', s, bold)
-    }
-    error(s, bold) {
-        return logger('error', s, bold)
-    }
+class Tool {
+  constructor() {
+    this.initNode();
+  }
+  initNode() {
+    const _filename = url.fileURLToPath((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.src || new URL('exec.cjs', document.baseURI).href)));
+    const _dirname = path$1.dirname(_filename);
+    const _root = path__namespace.join(_dirname, "..");
+    const version = process.versions.node;
+    const versionPre = version.split(".")[0];
+    this.node = {
+      _filename,
+      _dirname,
+      _root,
+      version,
+      versionPre
+    };
+  }
+  execSync(exec) {
+    require$$1.execSync(exec, { stdio: "inherit" });
+  }
+  writeJSONFileSync(path, content) {
+    fs$1.writeFileSync(path, JSON.stringify(content, null, 2));
+  }
+  getFileExt(path) {
+    // 使用lastIndexOf()找到最后一个'.'的位置
+    const dotIndex = path.lastIndexOf(".");
+    // 如果'.'不存在于路径中，则返回空字符串
+    if (dotIndex === -1)
+      throw new Error('The filepath "' + path + ' " without extension.')
+    // 使用slice()方法获取从最后一个'.'到字符串末尾的部分
+    return path.slice(dotIndex + 1)
+  }
+  success(s, bold) {
+    return logger("success", s, bold)
+  }
+  warn(s, bold) {
+    return logger("warn", s, bold)
+  }
+  error(s, bold) {
+    return logger("error", s, bold)
+  }
 }
 
 // 命令相关
 
 class Commands {
   constructor() {
-    this.main = 'dog1 ';
+    this.main = "dog1 ";
   }
-  resolve(){
+  resolve() {
     return {
       init: {
         alias: "ini",
         description:
-            "Choose multiple plugins to install and config with your node version.",
+          "Choose multiple plugins to install and config with your node version.",
         examples: [this.main + "init"]
       },
       install: {
         alias: "i",
         description:
-            "Choose single plugin to install and config with your node version.",
-        examples: [
-          this.main + "i <plugin-name>"
-        ]
+          "Choose single plugin to install and config with your node version.",
+        examples: [this.main + "i <plugin-name>"]
       },
       all: {
         alias: "a",
         description:
-            "Quickly install all plugins and config with your node version.",
+          "Quickly install all plugins and config with your node version.",
         examples: [this.main + "all"]
       },
       config: {
@@ -6719,186 +6718,184 @@ var readlineSync$1 = {};
 var readlineSync = /*@__PURE__*/getDefaultExportFromCjs(readlineSync$1);
 
 const tool$2 = new Tool();
-function isObject (obj){
-    return Object.prototype.toString.call(obj) === '[object Object]'
+function isObject(obj) {
+  return Object.prototype.toString.call(obj) === "[object Object]"
 }
 // 用户的package.json
-class Pkg{
-    constructor() {
-        const dirPath = process.cwd(); // 用户根路径
-        this.path = path$1.join( dirPath, 'package.json');
-        this.dirPath = dirPath;
+class Pkg {
+  constructor() {
+    const dirPath = process.cwd(); // 用户根路径
+    this.path = path$1.join(dirPath, "package.json");
+    this.dirPath = dirPath;
+  }
+  get() {
+    const defaultInfo = {
+      scripts: {}
+    };
+    if (!fs$1.existsSync(this.path)) {
+      const filepath = this.path;
+      tool$2.writeJSONFileSync(filepath, defaultInfo);
+      return defaultInfo
     }
-    get(){
-        const defaultInfo = {
-            scripts: {}
-        };
-        if(!fs$1.existsSync(this.path)) {
-            const filepath = this.path;
-            tool$2.writeJSONFileSync(filepath, defaultInfo);
-            return defaultInfo
-        }
-        // 一定存在，且类型是字符串
-        let infoStr = fs$1.readFileSync(this.path, 'utf-8');
-        let info;
-        try {
-            info = JSON.parse(infoStr);
-            if(!isObject(info) || !isObject(info.scripts)){
-                this.update(defaultInfo);
-                return defaultInfo
-            }
-            // 能通过检测的原始info
-            return info
-        }catch (e){
-            // 如果json转换失败, 根本不可能是对象，直接给默认值
-            this.update(defaultInfo);
-            return defaultInfo
-        }
+    // 一定存在，且类型是字符串
+    let infoStr = fs$1.readFileSync(this.path, "utf-8");
+    let info;
+    try {
+      info = JSON.parse(infoStr);
+      if (!isObject(info) || !isObject(info.scripts)) {
+        this.update(defaultInfo);
+        return defaultInfo
+      }
+      // 能通过检测的原始info
+      return info
+    } catch (e) {
+      // 如果json转换失败, 根本不可能是对象，直接给默认值
+      this.update(defaultInfo);
+      return defaultInfo
     }
-    update(content){
-        const filepath = this.path;
-        tool$2.writeJSONFileSync(filepath, content);
-    }
+  }
+  update(content) {
+    const filepath = this.path;
+    tool$2.writeJSONFileSync(filepath, content);
+  }
 }
 
 const tool$1 = new Tool();
 class Installer {
-    constructor(installs) {
-        // 需要一个packageManger工具
-        this.mgr = 'pnpm';
-        this.pkg = new Pkg();
-        this.node = tool$1.node;
-        this.pre(installs);
+  constructor(installs) {
+    // 需要一个packageManger工具
+    this.mgr = "pnpm";
+    this.pkg = new Pkg();
+    this.node = tool$1.node;
+    this.pre(installs);
+  }
+  checkGit(dirPath) {
+    const gitPath = path$1.join(dirPath, ".git");
+    if (!gitPath) {
+      //  最好用 'dev' 作为默认分支名
+      //  master就算不是默认分支时，都是不可删的
+      tool$1.execSync("git init -b dev");
+      // 更改git默认不区分大小写的配置
+      // 如果A文件已提交远程，再改为小写的a文件，引用a文件会出现本地正确、远程错误，因为远程还是大A文件)
+      tool$1.execSync("git config core.ignorecase false");
     }
-    checkGit(dirPath){
-        const gitPath = path$1.join(dirPath, '.git');
-        if(!gitPath){
-            //  最好用 'dev' 作为默认分支名
-            //  master就算不是默认分支时，都是不可删的
-            tool$1.execSync('git init -b dev');
-            // 更改git默认不区分大小写的配置
-            // 如果A文件已提交远程，再改为小写的a文件，引用a文件会出现本地正确、远程错误，因为远程还是大A文件)
-            tool$1.execSync('git config core.ignorecase false');
-        }
+  }
+  checkGitignore(dirPath) {
+    const gitignore = ".gitignore";
+    const gitignorePath = path$1.join(dirPath, gitignore);
+    if (!fs$1.existsSync(gitignorePath)) {
+      try {
+        fs$1.writeFileSync(gitignorePath, "git");
+      } catch (e) {
+        tool$1.error(gitignore);
+      }
     }
-    checkGitignore(dirPath){
-        const gitignore = '.gitignore';
-        const gitignorePath = path$1.join(dirPath, gitignore);
-        if(!fs$1.existsSync(gitignorePath)){
-            try {
-                fs$1.writeFileSync(gitignorePath, 'git');
-            }catch (e){
-                tool$1.error(gitignore);
-            }
-        }
+  }
+  handlePkg(pkg) {
+    console.log(pkg, "有注入命令");
+    const info = this.pkg.get();
+    for (let key in pkg) {
+      // 合并scripts内部属性
+      if (key === "scripts") {
+        info.scripts = { ...info.scripts, ...pkg.scripts };
+      } else {
+        info[key] = pkg[key];
+      }
     }
-    handlePkg(pkg){
-            console.log(pkg, '有注入命令');
-            const info = this.pkg.get();
-            for(let key in pkg){
-                // 合并scripts内部属性
-                if(key === 'scripts'){
-                    info.scripts = {...info.scripts, ...pkg.scripts};
-                }else {
-                    info[key] = pkg[key];
-                }
-            }
-            // 更新用户json
-            this.pkg.update(info);
+    // 更新用户json
+    this.pkg.update(info);
+  }
+  handleInstall(pkgName, dev = false, version = null) {
+    const { mgr } = this;
+    let exec = mgr === "yarn" ? mgr + " add" : mgr + " install";
+    dev && (exec += " -D");
+    version && (exec += "@" + version);
+    try {
+      // 捕获安装错误
+      tool$1.execSync(exec);
+    } catch (e) {
+      tool$1.error("Failed to Install " + pkgName + " : ");
+      console.log(e); // 承接上一行错误，但不要颜色打印
     }
-    handleInstall(pkgName, dev=false,version=null){
-        const {mgr} = this;
-        let exec = mgr === 'yarn' ? mgr + ' add' : mgr + ' install';
-        dev && (exec += ' -D');
-        version && (exec += '@' + version);
-        try {
-            // 捕获安装错误
-            tool$1.execSync(exec);
-        }catch (e){
-            tool$1.error('Failed to Install ' + pkgName + ' : ');
-            console.log(e); // 承接上一行错误，但不要颜色打印
-        }
+  }
+  handleConfig(config) {
+    const filepath = path$1.join(this.pkg.dirPath, config.file);
+    console.log(config, "有注入配置", filepath);
+    try {
+      const { json } = config;
+      if (typeof json === "object") tool$1.writeJSONFileSync(filepath, json);
+      else fs$1.writeFileSync(filepath, json);
+    } catch (e) {
+      return tool$1.error("注入配置失败")
     }
-    handleConfig(config){
-        const filepath =  path$1.join(this.pkg.dirPath, config.file);
-        console.log(config, '有注入配置',filepath);
-        try {
-            const {json} = config;
-            if(typeof json === 'object') tool$1.writeJSONFileSync(filepath, json);
-            else fs$1.writeFileSync(filepath, json);
-        }catch (e){
-            return tool$1.error('注入配置失败')
-        }
+  }
+  checkHusky(dev) {
+    const HUSKY = "husky";
+    // 这一个依赖.git
+    const { dirPath } = this.pkg;
+    this.checkGit(dirPath);
+    this.checkGitignore(dirPath);
+    // 如果node版本小于16，使用@8版本插件
+    const nodePreVersion = this.node.versionPre;
+    let pluginVersion = nodePreVersion < 16 ? 8 : null;
+    this.handleInstall(HUSKY, dev, pluginVersion);
+    tool$1.execSync("npx " + HUSKY + " install");
+  }
+  pre(installs) {
+    // console.log(installs,'installs')
+    for (let item of installs) {
+      const { plugin, config, dev, pkg } = item;
+      // 有需要合并的脚本
+      pkg && this.handlePkg(pkg);
+      // 有需要write的config文件
+      config && this.handleConfig(config);
+      if (plugin === "husky") this.checkHusky(dev);
+      else this.handleInstall(plugin, dev);
     }
-    checkHusky(dev){
-        const HUSKY = 'husky';
-        // 这一个依赖.git
-        const {dirPath} =  this.pkg;
-        this.checkGit(dirPath);
-        this.checkGitignore(dirPath);
-        // 如果node版本小于16，使用@8版本插件
-        const nodePreVersion = this.node.versionPre;
-        let pluginVersion = nodePreVersion < 16 ? 8 : null;
-        this.handleInstall(HUSKY, dev, pluginVersion);
-        tool$1.execSync('npx ' + HUSKY + ' install');
-    }
-    pre(installs){
-        // console.log(installs,'installs')
-        for(let item of installs){
-            const {plugin, config,dev,pkg} = item;
-            // 有需要合并的脚本
-            pkg && this.handlePkg(pkg);
-            // 有需要write的config文件
-            config && this.handleConfig(config);
-            if (plugin === 'husky') this.checkHusky(dev);
-            else this.handleInstall(plugin, dev);
-
-        }
-    }
-
+  }
 }
 
 const tool = new Tool();
-class Storage{
-    constructor() {
-        const rootPath = tool.node._root;
-        this.path = path__namespace.join(rootPath, 'storage.json');
+class Storage {
+  constructor() {
+    const rootPath = tool.node._root;
+    this.path = path__namespace.join(rootPath, "storage.json");
+  }
+  get() {
+    try {
+      if (!fs$1.existsSync(this.path)) throw new Error("Error storage.json path")
+      return JSON.parse(fs$1.readFileSync(this.path, "utf-8"))
+    } catch (e) {
+      throw new Error("Error: " + e)
     }
-    get(){
-        try {
-            if(!fs$1.existsSync(this.path)) throw new Error('Error storage.json path')
-            return JSON.parse(fs$1.readFileSync(this.path, 'utf-8'))
-        }catch (e){
-            throw new Error('Error: '+e)
-        }
-    }
-    update(content){
-        // 不要提供全量更改
-        const filepath = this.path;
-        tool.writeJSONFileSync(filepath, content);
-    }
+  }
+  update(content) {
+    // 不要提供全量更改
+    const filepath = this.path;
+    tool.writeJSONFileSync(filepath, content);
+  }
 }
 
-async function all(){
-    const answer =  readlineSync.question('Will install prettier,husky,typescript by your node version? (y/n) ');
-    if(answer.toLowerCase() !== 'n'){
-        const installs = new Storage().get().installs;
-        new Installer(installs);
-    }
+async function all() {
+  const answer = readlineSync.question(
+    "Will install prettier,husky,typescript by your node version? (y/n) "
+  );
+  if (answer.toLowerCase() !== "n") {
+    const installs = new Storage().get().installs;
+    new Installer(installs);
+  }
 }
 
-async function install(args){
-    console.log('install',args);
+async function install(args) {
+  console.log("install", args);
 }
 
-async function init(){
-
-}
+async function init() {}
 
 var execs = {
-    init,
-    install,
-    all
+  init,
+  install,
+  all
 };
 
 var sourceMapSupport = {exports: {}};
@@ -10769,29 +10766,31 @@ var sourceMapSupportExports = sourceMapSupport.exports;
 sourceMapSupportExports.install();
 
 function main() {
-    const tool = new Tool();
-    const myPkgPath = path$1.join(tool.node._dirname, '..','package.json');
-    const myPkg = JSON.parse(fs__namespace.readFileSync(myPkgPath, 'utf-8'));
-    const commands = new Commands();
-    const commandResolves = commands.resolve();
-    // 设置命令在前，选项在后
-    program.version(commands.main.split(' ')[0] + '@' + myPkg.version).usage('<command> [option]');
-    for (let key in commandResolves) {
-        const {alias, description} = commandResolves[key];
-        program
-            .command(key) // 注册命令
-            .alias(alias) // 配置命令别名
-            .description(description) // 配置命令描述
-            .action(function (name, {args}) {
-                // 除了上述的命令，其他统统匹配到这里
-                if (key === "*") return tool.error(description)
-                // console.log(process.cwd())
-                execs[key](args);
-            });
-    }
+  const tool = new Tool();
+  const myPkgPath = path$1.join(tool.node._dirname, "..", "package.json");
+  const myPkg = JSON.parse(fs__namespace.readFileSync(myPkgPath, "utf-8"));
+  const commands = new Commands();
+  const commandResolves = commands.resolve();
+  // 设置命令在前，选项在后
+  program
+    .version(commands.main.split(" ")[0] + "@" + myPkg.version)
+    .usage("<command> [option]");
+  for (let key in commandResolves) {
+    const { alias, description } = commandResolves[key];
+    program
+      .command(key) // 注册命令
+      .alias(alias) // 配置命令别名
+      .description(description) // 配置命令描述
+      .action(function (name, { args }) {
+        // 除了上述的命令，其他统统匹配到这里
+        if (key === "*") return tool.error(description)
+        // console.log(process.cwd())
+        execs[key](args);
+      });
+  }
 
-    // 最基础的一行，必须要解析
-    program.parse(process.argv);
+  // 最基础的一行，必须要解析
+  program.parse(process.argv);
 }
 
 main();

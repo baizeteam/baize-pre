@@ -1,5 +1,5 @@
-async function install(args){
-    console.log('install',args)
+async function install(args) {
+  console.log("install", args)
 }
 
 export default install

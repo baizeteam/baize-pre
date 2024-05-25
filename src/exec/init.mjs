@@ -1,6 +1,3 @@
-
-async function init(){
-
-}
+async function init() {}
 
 export default init

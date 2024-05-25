@@ -2,28 +2,26 @@
 
 class Commands {
   constructor() {
-    this.main = 'dog1 '
+    this.main = "dog1 "
   }
-  resolve(){
+  resolve() {
     return {
       init: {
         alias: "ini",
         description:
-            "Choose multiple plugins to install and config with your node version.",
+          "Choose multiple plugins to install and config with your node version.",
         examples: [this.main + "init"]
       },
       install: {
         alias: "i",
         description:
-            "Choose single plugin to install and config with your node version.",
-        examples: [
-          this.main + "i <plugin-name>"
-        ]
+          "Choose single plugin to install and config with your node version.",
+        examples: [this.main + "i <plugin-name>"]
       },
       all: {
         alias: "a",
         description:
-            "Quickly install all plugins and config with your node version.",
+          "Quickly install all plugins and config with your node version.",
         examples: [this.main + "all"]
       },
       config: {
