@@ -4,7 +4,9 @@ import * as path from "path"
 import chalk from "chalk"
 import { execSync } from "child_process"
 import fs from "fs"
+import Commands from "../common/Commands.mjs";
 
+const commands = new Commands()
 const logger = function (type, s, bold) {
   let color = "yellow"
   if (type === "success") color = "green"
@@ -53,6 +55,9 @@ class Tool {
   }
   error(s, bold) {
     return logger("error", s, bold)
+  }
+  done(s){
+    this.success(commands.main + s + ' done. ',true)
   }
 }
 

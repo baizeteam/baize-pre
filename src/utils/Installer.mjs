@@ -35,8 +35,9 @@ class Installer {
     }
   }
   handlePkg(pkg) {
-    console.log(pkg, "有注入命令")
+    // console.log(pkg, "有注入命令")
     const info = this.pkg.get()
+    // console.log(info,'get info')
     for (let key in pkg) {
       // 合并scripts内部属性
       if (key === "scripts") {
@@ -50,12 +51,15 @@ class Installer {
   }
   handleInstall(pkgName, dev = false, version = null) {
     const { mgr } = this
-    let exec = mgr === "yarn" ? mgr + " add" : mgr + " install"
-    dev && (exec += " -D")
+    let exec = mgr === "yarn" ? mgr + " add " : mgr + " install "
+    dev && (exec += " -D ")
+    exec += pkgName
     version && (exec += "@" + version)
     try {
       // 捕获安装错误
+      tool.warn("Installing " + pkgName + " ... ")
       tool.execSync(exec)
+      tool.success("Installed " + pkgName + " successfully. ")
     } catch (e) {
       tool.error("Failed to Install " + pkgName + " : ")
       console.log(e) // 承接上一行错误，但不要颜色打印
@@ -63,7 +67,8 @@ class Installer {
   }
   handleConfig(config) {
     const filepath = path.join(this.pkg.dirPath, config.file)
-    console.log(config, "有注入配置", filepath)
+    // console.log(config, "有注入配置", filepath)
+    console.log('注入配置',filepath)
     try {
       const { json } = config
       if (typeof json === "object") tool.writeJSONFileSync(filepath, json)

@@ -55,7 +55,8 @@
           "exclude": ["node_modules"]
         }
       },
-      "dev": true
+      "dev": true,
+      "pkg": {}
     }
   ]
 }

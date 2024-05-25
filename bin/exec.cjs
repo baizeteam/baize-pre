@@ -5288,6 +5288,50 @@ var source = chalk;
 
 var chalk$1 = /*@__PURE__*/getDefaultExportFromCjs(source);
 
+// 命令相关
+
+class Commands {
+  constructor() {
+    this.main = "dog1 ";
+  }
+  resolve() {
+    return {
+      init: {
+        alias: "ini",
+        description:
+          "Choose multiple plugins to install and config with your node version.",
+        examples: [this.main + "init"]
+      },
+      install: {
+        alias: "i",
+        description:
+          "Choose single plugin to install and config with your node version.",
+        examples: [this.main + "i <plugin-name>"]
+      },
+      all: {
+        alias: "a",
+        description:
+          "Quickly install all plugins and config with your node version.",
+        examples: [this.main + "all"]
+      },
+      config: {
+        alias: "conf",
+        description: "Configure the cli variable. Once config, use everywhere.",
+        examples: [
+          this.main + "config set <k> <v>",
+          this.main + "config get <k>"
+        ]
+      },
+      "*": {
+        alias: "",
+        description: "Command not found.",
+        examples: []
+      }
+    }
+  }
+}
+
+const commands = new Commands();
 const logger = function (type, s, bold) {
   let color = "yellow";
   if (type === "success") color = "green";
@@ -5337,48 +5381,8 @@ class Tool {
   error(s, bold) {
     return logger("error", s, bold)
   }
-}
-
-// 命令相关
-
-class Commands {
-  constructor() {
-    this.main = "dog1 ";
-  }
-  resolve() {
-    return {
-      init: {
-        alias: "ini",
-        description:
-          "Choose multiple plugins to install and config with your node version.",
-        examples: [this.main + "init"]
-      },
-      install: {
-        alias: "i",
-        description:
-          "Choose single plugin to install and config with your node version.",
-        examples: [this.main + "i <plugin-name>"]
-      },
-      all: {
-        alias: "a",
-        description:
-          "Quickly install all plugins and config with your node version.",
-        examples: [this.main + "all"]
-      },
-      config: {
-        alias: "conf",
-        description: "Configure the cli variable. Once config, use everywhere.",
-        examples: [
-          this.main + "config set <k> <v>",
-          this.main + "config get <k>"
-        ]
-      },
-      "*": {
-        alias: "",
-        description: "Command not found.",
-        examples: []
-      }
-    }
+  done(s){
+    this.success(commands.main + s + ' done. ',true);
   }
 }
 
@@ -6717,7 +6721,7 @@ var readlineSync$1 = {};
 
 var readlineSync = /*@__PURE__*/getDefaultExportFromCjs(readlineSync$1);
 
-const tool$2 = new Tool();
+const tool$3 = new Tool();
 function isObject(obj) {
   return Object.prototype.toString.call(obj) === "[object Object]"
 }
@@ -6734,7 +6738,7 @@ class Pkg {
     };
     if (!fs$1.existsSync(this.path)) {
       const filepath = this.path;
-      tool$2.writeJSONFileSync(filepath, defaultInfo);
+      tool$3.writeJSONFileSync(filepath, defaultInfo);
       return defaultInfo
     }
     // 一定存在，且类型是字符串
@@ -6756,17 +6760,17 @@ class Pkg {
   }
   update(content) {
     const filepath = this.path;
-    tool$2.writeJSONFileSync(filepath, content);
+    tool$3.writeJSONFileSync(filepath, content);
   }
 }
 
-const tool$1 = new Tool();
+const tool$2 = new Tool();
 class Installer {
   constructor(installs) {
     // 需要一个packageManger工具
     this.mgr = "pnpm";
     this.pkg = new Pkg();
-    this.node = tool$1.node;
+    this.node = tool$2.node;
     this.pre(installs);
   }
   checkGit(dirPath) {
@@ -6774,10 +6778,10 @@ class Installer {
     if (!gitPath) {
       //  最好用 'dev' 作为默认分支名
       //  master就算不是默认分支时，都是不可删的
-      tool$1.execSync("git init -b dev");
+      tool$2.execSync("git init -b dev");
       // 更改git默认不区分大小写的配置
       // 如果A文件已提交远程，再改为小写的a文件，引用a文件会出现本地正确、远程错误，因为远程还是大A文件)
-      tool$1.execSync("git config core.ignorecase false");
+      tool$2.execSync("git config core.ignorecase false");
     }
   }
   checkGitignore(dirPath) {
@@ -6787,13 +6791,14 @@ class Installer {
       try {
         fs$1.writeFileSync(gitignorePath, "git");
       } catch (e) {
-        tool$1.error(gitignore);
+        tool$2.error(gitignore);
       }
     }
   }
   handlePkg(pkg) {
-    console.log(pkg, "有注入命令");
+    // console.log(pkg, "有注入命令")
     const info = this.pkg.get();
+    // console.log(info,'get info')
     for (let key in pkg) {
       // 合并scripts内部属性
       if (key === "scripts") {
@@ -6807,26 +6812,30 @@ class Installer {
   }
   handleInstall(pkgName, dev = false, version = null) {
     const { mgr } = this;
-    let exec = mgr === "yarn" ? mgr + " add" : mgr + " install";
-    dev && (exec += " -D");
+    let exec = mgr === "yarn" ? mgr + " add " : mgr + " install ";
+    dev && (exec += " -D ");
+    exec += pkgName;
     version && (exec += "@" + version);
     try {
       // 捕获安装错误
-      tool$1.execSync(exec);
+      tool$2.warn("Installing " + pkgName + " ... ");
+      tool$2.execSync(exec);
+      tool$2.success("Installed " + pkgName + " successfully. ");
     } catch (e) {
-      tool$1.error("Failed to Install " + pkgName + " : ");
+      tool$2.error("Failed to Install " + pkgName + " : ");
       console.log(e); // 承接上一行错误，但不要颜色打印
     }
   }
   handleConfig(config) {
     const filepath = path$1.join(this.pkg.dirPath, config.file);
-    console.log(config, "有注入配置", filepath);
+    // console.log(config, "有注入配置", filepath)
+    console.log('注入配置',filepath);
     try {
       const { json } = config;
-      if (typeof json === "object") tool$1.writeJSONFileSync(filepath, json);
+      if (typeof json === "object") tool$2.writeJSONFileSync(filepath, json);
       else fs$1.writeFileSync(filepath, json);
     } catch (e) {
-      return tool$1.error("注入配置失败")
+      return tool$2.error("注入配置失败")
     }
   }
   checkHusky(dev) {
@@ -6839,7 +6848,7 @@ class Installer {
     const nodePreVersion = this.node.versionPre;
     let pluginVersion = nodePreVersion < 16 ? 8 : null;
     this.handleInstall(HUSKY, dev, pluginVersion);
-    tool$1.execSync("npx " + HUSKY + " install");
+    tool$2.execSync("npx " + HUSKY + " install");
   }
   pre(installs) {
     // console.log(installs,'installs')
@@ -6855,10 +6864,10 @@ class Installer {
   }
 }
 
-const tool = new Tool();
+const tool$1 = new Tool();
 class Storage {
   constructor() {
-    const rootPath = tool.node._root;
+    const rootPath = tool$1.node._root;
     this.path = path__namespace.join(rootPath, "storage.json");
   }
   get() {
@@ -6872,10 +6881,11 @@ class Storage {
   update(content) {
     // 不要提供全量更改
     const filepath = this.path;
-    tool.writeJSONFileSync(filepath, content);
+    tool$1.writeJSONFileSync(filepath, content);
   }
 }
 
+const tool = new Tool();
 async function all() {
   const answer = readlineSync.question(
     "Will install prettier,husky,typescript by your node version? (y/n) "
@@ -6883,6 +6893,7 @@ async function all() {
   if (answer.toLowerCase() !== "n") {
     const installs = new Storage().get().installs;
     new Installer(installs);
+    tool.done('all');
   }
 }
 
