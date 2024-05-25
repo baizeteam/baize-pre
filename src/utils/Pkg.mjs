@@ -3,9 +3,6 @@ import path from "path"
 import Tool from "./Tool.mjs"
 
 const tool = new Tool()
-function isObject(obj) {
-  return Object.prototype.toString.call(obj) === "[object Object]"
-}
 // 用户的package.json
 class Pkg {
   constructor() {
@@ -27,7 +24,7 @@ class Pkg {
     let info
     try {
       info = JSON.parse(infoStr)
-      if (!isObject(info) || !isObject(info.scripts)) {
+      if (!tool.isObject(info) || !tool.isObject(info.scripts)) {
         this.update(defaultInfo)
         return defaultInfo
       }
