@@ -1,11 +1,12 @@
 import Installer from "../utils/Installer.mjs";
-import Mgr from "../utils/Mgr.mjs";
+import Tool from "../utils/Tool.mjs";
 
-const mgr = new Mgr()
+const tool = new Tool()
+
 async function init() {
-  await mgr.choose()
-  const installer = new Installer(mgr.mgr)
-  // await installer
+  const installer = new Installer()
+  await installer.choose()
+  tool.done('init')
 }
 
 export default init

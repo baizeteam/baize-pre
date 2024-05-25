@@ -16,7 +16,7 @@ function main() {
   const commandResolves = commands.resolve()
   // 设置命令在前，选项在后
   program
-    .version(commands.main.split(" ")[0] + "@" + myPkg.version)
+    .version('dog-pre1' + "@" + myPkg.version)
     .usage("<command> [option]")
   for (let key in commandResolves) {
     const { alias, description } = commandResolves[key]
@@ -27,8 +27,7 @@ function main() {
       .action(function (name, { args }) {
         // 除了上述的命令，其他统统匹配到这里
         if (key === "*") return tool.error(description)
-        // console.log(process.cwd())
-        execs[key](args)
+        return execs[key](args)
       })
   }
 

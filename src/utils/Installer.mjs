@@ -4,14 +4,16 @@ import fs from "fs"
 import path from "path"
 import Storage from "./Storage.mjs";
 import inquirer from "inquirer";
+import Mgr from "./Mgr.mjs";
 
 const tool = new Tool()
 const storage = new Storage()
+const mgr = new Mgr()
 
 class Installer {
-  constructor(mgr='pnpm') {
+  constructor() {
     // 需要一个packageManger工具
-    this.mgr = mgr
+    this.mgr = mgr.mgr
     this.pkg = new Pkg()
     this.node = tool.node
   }
@@ -73,7 +75,7 @@ class Installer {
   #handleConfig(config) {
     const filepath = path.join(this.pkg.dirPath, config.file)
     // console.log(config, "有注入配置", filepath)
-    console.log("注入配置", filepath)
+    // console.log("注入配置", filepath)
     try {
       const { json } = config
       if (typeof json === "object") tool.writeJSONFileSync(filepath, json)
@@ -93,7 +95,10 @@ class Installer {
     this.#handleInstall(HUSKY, dev, pluginVersion)
     tool.execSync("npx " + HUSKY + " install")
   }
-  preInstall(installs) {
+  async install(installs) {
+    // install前先选择安装工具
+    await mgr.choose()
+    this.mgr = mgr.mgr
     // console.log(installs,'installs')
     for (let item of installs) {
       const { plugin, config, dev, pkg } = item
@@ -123,7 +128,7 @@ class Installer {
     const answers = await inquirer.prompt(question)
     const installs = storage.getInstalls()
     const matInstalls = installs.filter(item=> answers[questionKey].includes(item.plugin))
-    this.preInstall(matInstalls)
+    await this.install(matInstalls)
   }
 }
 
