@@ -1,6 +1,6 @@
-import Tool from "./Tool.mjs"
 import * as path from "path"
 import fs from "fs"
+import Tool from "./Tool.mjs"
 
 const tool = new Tool()
 
