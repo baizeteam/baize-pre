@@ -8,14 +8,16 @@ export default {
   input: "src/main.mjs", // 注意这里可能是 .ts 文件而不是 .mjs
   output: {
     sourcemap: true,
-    file: "bin/exec.cjs",
+    file: "bin/build.cjs",
     format: "cjs" // 输出格式为 CommonJS
     // 其他选项...
   },
-
+  external: ["path", "fs", "child_process" /* ...其他Node.js核心模块... */],
   plugins: [
     rollupPluginJson(),
-    resolve(), // 使用 node-resolve 插件解析第三方模块
+    resolve({
+      preferBuiltins: false // 改为 false 以使用 node_modules 中的版本
+    }), // 使用 node-resolve 插件解析第三方模块
     commonjs() // 将 CommonJS 转换为 ES6（如果需要的话），但在这里主要是转换 Node.js 依赖
     // typescript(), // 使用 Rollup 的 TypeScript 插件
     // 其他插件...

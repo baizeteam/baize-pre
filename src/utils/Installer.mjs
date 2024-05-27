@@ -18,10 +18,10 @@ class Installer {
     this.node = tool.node
   }
 
-  handlePkg(pkg) {
+  #handlePkg(pkg) {
     // console.log(pkg, "有注入命令")
     const info = this.pkg.get()
-    // console.log(info,'get info')
+    console.log(info,'get info')
     for (let key in pkg) {
       // 合并scripts内部属性
       if (key === "scripts") {
@@ -36,7 +36,8 @@ class Installer {
 
   #checkGit() {
     const gitPath = path.join(this.pkg.dirPath, ".git")
-    if (!gitPath) {
+    // console.log(gitPath,'gitpath')
+    if (!fs.existsSync(gitPath)) {
       //  最好用 'dev' 作为默认分支名
       //  master就算不是默认分支时，都是不可删的
       tool.execSync("git init -b dev")
@@ -75,25 +76,24 @@ class Installer {
   #handleConfig(config) {
     const filepath = path.join(this.pkg.dirPath, config.file)
     // console.log(config, "有注入配置", filepath)
-    // console.log("注入配置", filepath)
     try {
       const { json } = config
       if (typeof json === "object") tool.writeJSONFileSync(filepath, json)
       else fs.writeFileSync(filepath, json)
+      // console.log(filepath,'filepath')
     } catch (e) {
+      // console.log(filepath,'失败 filepath')
       return tool.error("注入配置失败")
     }
   }
-  #checkHusky(dev) {
+  #checkHusky() {
     const HUSKY = "husky"
     // 这一个依赖.git
     this.#checkGit()
     this.#checkGitignore()
     // 如果node版本小于16，使用@8版本插件
-    const nodePreV = this.node.versionPre
-    let pluginVersion = nodePreV < 16 ? 8 : null
-    this.#handleInstall(HUSKY, dev, pluginVersion)
     tool.execSync("npx " + HUSKY + " install")
+    // console.log('checkhusky1')
   }
   async install(installs) {
     // install前先选择安装工具
@@ -102,12 +102,13 @@ class Installer {
     // console.log(installs,'installs')
     for (let item of installs) {
       const { plugin, config, dev, pkg } = item
+      this.#handleInstall(plugin, dev, (plugin === 'husky' && this.node.versionPre < 16) ? 8 : null)
+      // 顺序很重要，放最前面
+      plugin === "husky" && this.#checkHusky()
       // 有需要合并的脚本
-      pkg && this.handlePkg(pkg)
+      pkg && this.#handlePkg(pkg)
       // 有需要write的config文件
       config && this.#handleConfig(config)
-      if (plugin === "husky") this.#checkHusky(dev)
-      else this.#handleInstall(plugin, dev)
     }
   }
   async choose(){

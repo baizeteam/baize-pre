@@ -2,7 +2,7 @@
 
 class Commands {
   constructor() {
-    this.main = "dog1 "
+    this.main = "dog "
   }
   resolve() {
     return {
