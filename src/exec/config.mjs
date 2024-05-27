@@ -32,8 +32,11 @@ class Config{
   get(){
     const reduceList = this[this.default ? 'installs' : 'list'].map(item=> ({
       name: item.plugin,
-      config: item.config
+      config: JSON.stringify(item.config.json)
     }))
+    if(this.default){
+      this.default = false
+    }
    return console.log(reduceList)
   }
   set(){
@@ -45,15 +48,17 @@ class Config{
       if (answer.toLowerCase() !== "n") {
         try {
           installStore.reset()
+          tool.success('Successfully.')
         }catch (e){
           tool.error('Error: ' + e)
         }
       }else{
         tool.warn('Cancel to set.')
       }
+      this.default = false
     }else{
       const keyStr = this.keys.join(',')
-      console.log(keyStr, 'keyStr')
+      // console.log(keyStr, 'keyStr')
       const answer = readlineSync.question(
           "Would you want to set " + keyStr + ' form your local files ? (y/n)'
       )
@@ -62,8 +67,9 @@ class Config{
           const filepath = path.join(pkg.dirPath, item.config.file)
           try{
             const file = fs.readFileSync(filepath, 'utf-8')
-            console.log(file,'file')
+            // console.log(file,'file')
             installStore.setConfig(item.plugin, file)
+            tool.success('Successfully.')
           }catch (e){
             return tool.error('Error: read your local file failed.')
           }

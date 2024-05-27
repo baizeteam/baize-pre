@@ -12,7 +12,7 @@ async function install(args) {
   const matInstalls = installs.filter(item=> args.includes(item.plugin))
   if(!matInstalls.length){
     const argStr = args.join(' | ')
-    return tool.error('dog not allowed to install ' + argStr)
+    return tool.error('dog1 not allowed to install ' + argStr.trim() || undefined)
   }
   const installer = new Installer()
   await installer.install(installs)

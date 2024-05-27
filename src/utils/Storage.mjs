@@ -26,7 +26,7 @@ class Storage{
     // 不要提供全量更改
     const filepath = this.path
       const info = this.get()
-      if(!info.key) throw new Error('Error at Storage.update')
+      if(!info[key]) throw new Error('Error at Storage.update')
       info[key] = content
     tool.writeJSONFileSync(filepath, info)
   }
