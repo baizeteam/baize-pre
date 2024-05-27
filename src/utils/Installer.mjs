@@ -1,8 +1,8 @@
 import fs from "fs"
 import path from "path"
-import {InstallStore} from "./Storage.mjs";
-import inquirer from "inquirer";
-import Mgr from "./Mgr.mjs";
+import { InstallStore } from "./Storage.mjs"
+import inquirer from "inquirer"
+import Mgr from "./Mgr.mjs"
 import Tool from "./Tool.mjs"
 import Pkg from "./Pkg.mjs"
 
@@ -21,7 +21,7 @@ class Installer {
   #handlePkg(pkg) {
     // console.log(pkg, "有注入命令")
     const info = this.pkg.get()
-    console.log(info,'get info')
+    console.log(info, "get info")
     for (let key in pkg) {
       // 合并scripts内部属性
       if (key === "scripts") {
@@ -102,7 +102,11 @@ class Installer {
     // console.log(installs,'installs')
     for (let item of installs) {
       const { plugin, config, dev, pkg } = item
-      this.#handleInstall(plugin, dev, (plugin === 'husky' && this.node.versionPre < 16) ? 8 : null)
+      this.#handleInstall(
+        plugin,
+        dev,
+        plugin === "husky" && this.node.versionPre < 16 ? 8 : null
+      )
       // 顺序很重要，放最前面
       plugin === "husky" && this.#checkHusky()
       // 有需要合并的脚本
@@ -111,24 +115,26 @@ class Installer {
       config && this.#handleConfig(config)
     }
   }
-  async choose(){
-    const questionKey = 'key'
+  async choose() {
+    const questionKey = "key"
     const storagePlugins = installStore.getPlugins()
     const question = [
       {
-        type: 'checkbox',
+        type: "checkbox",
         name: questionKey,
-        message: 'Choose the plugins what you want to install.',
+        message: "Choose the plugins what you want to install.",
         choices: storagePlugins,
-        validate(answers){
-          if(!answers.length) return 'You must choose at least one plugin.'
+        validate(answers) {
+          if (!answers.length) return "You must choose at least one plugin."
           return true
         }
       }
     ]
     const answers = await inquirer.prompt(question)
     const installs = installStore.get()
-    const matInstalls = installs.filter(item=> answers[questionKey].includes(item.plugin))
+    const matInstalls = installs.filter((item) =>
+      answers[questionKey].includes(item.plugin)
+    )
     await this.install(matInstalls)
   }
 }
