@@ -13,7 +13,7 @@ const commands = new Commands()
 class Config{
   constructor() {
     this.command = 'config'
-    this.defaultKey = 'default'
+    this.default = false // default状态
     this.args = []
     this.list = []
     this.keys = []
@@ -30,33 +30,47 @@ class Config{
     this[this.action]() // get or set, 此时arg[1]必有
   }
   get(){
-    const reduceList = this.list.map(item=> ({
+    const reduceList = this[this.default ? 'installs' : 'list'].map(item=> ({
       name: item.plugin,
       config: item.config
     }))
    return console.log(reduceList)
-    // get all的判断
   }
   set(){
     // set default的判断
-    const keyStr = this.keys.join(',')
-    console.log(keyStr, 'keyStr')
-    const answer = readlineSync.question(
-        "Would you want to set " + keyStr + ' form your local files ? (y/n)'
-    )
-    if (answer.toLowerCase() !== "n") {
-      this.list.forEach(item=>{
-        const filepath = path.join(pkg.dirPath, item.config.file)
-        try{
-          const file = fs.readFileSync(filepath, 'utf-8')
-          console.log(file,'file')
-          installStore.setConfig(item.plugin, file)
+    if(this.default){
+      const answer = readlineSync.question(
+          "Would you want to set default config ? (y/n)"
+      )
+      if (answer.toLowerCase() !== "n") {
+        try {
+          installStore.reset()
         }catch (e){
-          return tool.error('Error: read your local file failed.')
+          tool.error('Error: ' + e)
         }
-      })
+      }else{
+        tool.warn('Cancel to set.')
+      }
     }else{
-      tool.warn('Cancel to set.')
+      const keyStr = this.keys.join(',')
+      console.log(keyStr, 'keyStr')
+      const answer = readlineSync.question(
+          "Would you want to set " + keyStr + ' form your local files ? (y/n)'
+      )
+      if (answer.toLowerCase() !== "n") {
+        this.list.forEach(item=>{
+          const filepath = path.join(pkg.dirPath, item.config.file)
+          try{
+            const file = fs.readFileSync(filepath, 'utf-8')
+            console.log(file,'file')
+            installStore.setConfig(item.plugin, file)
+          }catch (e){
+            return tool.error('Error: read your local file failed.')
+          }
+        })
+      }else{
+        tool.warn('Cancel to set.')
+      }
     }
   }
   #error(){
@@ -74,8 +88,7 @@ class Config{
       // console.log(this.action, this.args,'args')
       if(!this.args[1]) return this.#error()
       if(this.args[1] === installStore.defaultKey){
-        this.list = this.installs
-        return
+        return this.default = true
       }
       const keys = this.args.slice(1)
       const matInstall = this.installs.filter(item=> keys.includes(item.plugin))
