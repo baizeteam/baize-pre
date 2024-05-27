@@ -35,7 +35,7 @@ class Tool {
   execSync(exec) {
     execSync(exec, { stdio: "inherit" })
   }
-  isObject(obj){
+  isObject(obj) {
     return Object.prototype.toString.call(obj) === "[object Object]"
   }
   writeJSONFileSync(path, content) {

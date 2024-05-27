@@ -1,5 +1,5 @@
-import inquirer from 'inquirer'
-import Tool from "./Tool.mjs";
+import inquirer from "inquirer"
+import Tool from "./Tool.mjs"
 
 const YARN = "yarn"
 const PNPM = "pnpm"
@@ -13,25 +13,25 @@ class Mgr {
     this.npm = NPM
     this.mgrList = [PNPM, YARN, NPM]
   }
-  async choose(){
-    const questionKey = 'manager'
+  async choose() {
+    const questionKey = "manager"
     const question = [
       {
-        type: 'list',
+        type: "list",
         name: questionKey,
-        message: 'Which package manager to use?',
+        message: "Which package manager to use?",
         choices: this.mgrList
       }
     ]
     const answer = await inquirer.prompt(question)
     this.mgr = answer[questionKey]
-    const {mgr, pnpm} = this
-    tool.success('You have chosen: ' + mgr)
+    const { mgr, pnpm } = this
+    tool.success("You have chosen: " + mgr)
     const nodePreV = tool.node.versionPre
     const nodeV = tool.node.version
-    if(nodePreV < 16 && mgr === pnpm){
-      tool.error('Sorry, your node version is not support to ' + pnpm)
-      return tool.error('Expected >= 16, but got ' + nodeV)
+    if (nodePreV < 16 && mgr === pnpm) {
+      tool.error("Sorry, your node version is not support to " + pnpm)
+      return tool.error("Expected >= 16, but got " + nodeV)
     }
   }
 }

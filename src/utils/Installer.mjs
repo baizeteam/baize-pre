@@ -21,17 +21,11 @@ class Installer {
   #handlePkg(pkg) {
     // console.log(pkg, "有注入命令")
     const info = this.pkg.get()
-    console.log(info, "get info")
+    console.log(info, "get info", pkg)
     for (let key in pkg) {
-      // 合并scripts内部属性
-      if (key === "scripts") {
-        info.scripts = { ...info.scripts, ...pkg.scripts }
-      } else {
-        info[key] = pkg[key]
-      }
+      // 更新用户json
+      this.pkg.update(key, pkg[key])
     }
-    // 更新用户json
-    this.pkg.update(info)
   }
 
   #checkGit() {

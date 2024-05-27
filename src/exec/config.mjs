@@ -1,18 +1,18 @@
-import readlineSync from "readline-sync";
-import fs from "fs";
-import path from "path";
-import {InstallStore} from "../utils/Storage.mjs";
-import Commands from "../common/Commands.mjs";
-import Tool from "../utils/Tool.mjs";
-import Pkg from "../utils/Pkg.mjs";
+import readlineSync from "readline-sync"
+import fs from "fs"
+import path from "path"
+import { InstallStore } from "../utils/Storage.mjs"
+import Commands from "../common/Commands.mjs"
+import Tool from "../utils/Tool.mjs"
+import Pkg from "../utils/Pkg.mjs"
 
 const tool = new Tool()
 const pkg = new Pkg()
 const installStore = new InstallStore()
 const commands = new Commands()
-class Config{
+class Config {
   constructor() {
-    this.command = 'config'
+    this.command = "config"
     this.default = false // default状态
     this.args = []
     this.list = []
@@ -20,88 +20,93 @@ class Config{
     this.installs = installStore.get()
     this.plugins = installStore.getPlugins()
   }
-  init(args){
+  init(args) {
     this.args = args
     try {
       this.#check()
-    }catch (e){
+    } catch (e) {
       return tool.error(e)
     }
     this[this.action]() // get or set, 此时arg[1]必有
   }
-  get(){
-    const reduceList = this[this.default ? 'installs' : 'list'].map(item=> ({
+  get() {
+    const reduceList = this[this.default ? "installs" : "list"].map((item) => ({
       name: item.plugin,
       config: JSON.stringify(item.config.json)
     }))
-    if(this.default){
+    if (this.default) {
       this.default = false
     }
-   return console.log(reduceList)
+    return console.log(reduceList)
   }
-  set(){
+  set() {
     // set default的判断
-    if(this.default){
+    if (this.default) {
       const answer = readlineSync.question(
-          "Would you want to set default config ? (y/n)"
+        "Would you want to set default config ? (y/n)"
       )
       if (answer.toLowerCase() !== "n") {
         try {
           installStore.reset()
-          tool.success('Successfully.')
-        }catch (e){
-          tool.error('Error: ' + e)
+          tool.success("Successfully.")
+        } catch (e) {
+          tool.error("Error: " + e)
         }
-      }else{
-        tool.warn('Cancel to set.')
+      } else {
+        tool.warn("Cancel to set.")
       }
       this.default = false
-    }else{
-      const keyStr = this.keys.join(',')
+    } else {
+      const keyStr = this.keys.join(",")
       // console.log(keyStr, 'keyStr')
       const answer = readlineSync.question(
-          "Would you want to set " + keyStr + ' form your local files ? (y/n)'
+        "Would you want to set " + keyStr + " form your local files ? (y/n)"
       )
       if (answer.toLowerCase() !== "n") {
-        this.list.forEach(item=>{
+        this.list.forEach((item) => {
           const filepath = path.join(pkg.dirPath, item.config.file)
-          try{
-            const file = fs.readFileSync(filepath, 'utf-8')
+          try {
+            const file = fs.readFileSync(filepath, "utf-8")
             // console.log(file,'file')
             installStore.setConfig(item.plugin, file)
-            tool.success('Successfully.')
-          }catch (e){
-            return tool.error('Error: read your local file failed.')
+            tool.success("Successfully.")
+          } catch (e) {
+            return tool.error("Error: read your local file failed.")
           }
         })
-      }else{
-        tool.warn('Cancel to set.')
+      } else {
+        tool.warn("Cancel to set.")
       }
     }
   }
-  #error(){
-    const complete = '"' + commands.main + this.command + ' ' + this.args.join(' ') + '"'
-    const example = commands.resolve()[this.command].examples.join(' | ')
-    const msg = 'Error command. Expected ' + example + ' , got ' + complete
+  #error() {
+    const complete =
+      '"' + commands.main + this.command + " " + this.args.join(" ") + '"'
+    const example = commands.resolve()[this.command].examples.join(" | ")
+    const msg = "Error command. Expected " + example + " , got " + complete
     throw new Error(msg)
   }
-  #check(){
-    if(!this.args.length) return this.#error()
-    if(this.args.length > 3) return this.#error(true)
+  #check() {
+    if (!this.args.length) return this.#error()
+    if (this.args.length > 3) return this.#error(true)
     this.action = this.args[0].trim() // get of set
-    if(this.action !== 'get' && this.action !== 'set') return this.#error()
-    if(this.action === 'get' || this.action === 'set'){
+    if (this.action !== "get" && this.action !== "set") return this.#error()
+    if (this.action === "get" || this.action === "set") {
       // console.log(this.action, this.args,'args')
-      if(!this.args[1]) return this.#error()
-      if(this.args[1] === installStore.defaultKey){
-        return this.default = true
+      if (!this.args[1]) return this.#error()
+      if (this.args[1] === installStore.defaultKey) {
+        return (this.default = true)
       }
       const keys = this.args.slice(1)
-      const matInstall = this.installs.filter(item=> keys.includes(item.plugin))
-      if(!matInstall.length){
+      const matInstall = this.installs.filter((item) =>
+        keys.includes(item.plugin)
+      )
+      if (!matInstall.length) {
         throw new Error(
-            'Key is not found.' +
-            'Try to get 【' + this.plugins.join(' | ') + '】'
+          "Key is not found." +
+            "Try to get 【" +
+            this.plugins.join(" | ") +
+            "】"
         )
       }
       this.list = matInstall
@@ -109,7 +114,6 @@ class Config{
     }
   }
 }
-
 
 const config = new Config()
 export default config.init.bind(config)

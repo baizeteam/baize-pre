@@ -9,36 +9,60 @@ class Pkg {
     const dirPath = process.cwd() // 用户根路径
     this.path = path.join(dirPath, "package.json")
     this.dirPath = dirPath
+    // 添加一个私有变量来存储缓存
+    this._cache = null;
+  }
+  // 私有方法，用于从文件系统中读取并解析package.json
+  parse() {
+    if (fs.existsSync(this.path)) {
+      let infoStr = fs.readFileSync(this.path, "utf-8");
+      let info;
+      try {
+        info = JSON.parse(infoStr);
+        // 确保info和scripts都是对象
+        if (!tool.isObject(info) || !tool.isObject(info.scripts)) {
+          throw new Error('Invalid package.json format');
+        }
+        return info;
+      } catch (e) {
+        // 如果json转换失败, 则返回null
+        return null;
+      }
+    }
+    return null;
   }
   get() {
+    if (this._cache) {
+      return this._cache;
+    }
     const defaultInfo = {
       scripts: {}
     }
-    if (!fs.existsSync(this.path)) {
-      const filepath = this.path
-      tool.writeJSONFileSync(filepath, defaultInfo)
-      return defaultInfo
+    // 读取并解析package.json，如果文件不存在或格式不正确，则写入默认值
+    let info = this.parse();
+    if (!info) {
+      tool.writeJSONFileSync(this.path, defaultInfo);
+      info = defaultInfo;
     }
-    // 一定存在，且类型是字符串
-    let infoStr = fs.readFileSync(this.path, "utf-8")
-    let info
-    try {
-      info = JSON.parse(infoStr)
-      if (!tool.isObject(info) || !tool.isObject(info.scripts)) {
-        this.update(defaultInfo)
-        return defaultInfo
-      }
-      // 能通过检测的原始info
-      return info
-    } catch (e) {
-      // 如果json转换失败, 根本不可能是对象，直接给默认值
-      this.update(defaultInfo)
-      return defaultInfo
-    }
+    // 更新缓存
+    this._cache = info;
+    // 返回解析后的info
+    return info;
   }
-  update(content) {
-    const filepath = this.path
-    tool.writeJSONFileSync(filepath, content)
+  update(key, content) {
+    // 不要提供全量更改
+    const filepath = this.path;
+    const info = this.get(); // 这里会用到缓存，但如果key是'scripts'且需要合并，则缓存可能不是最新的
+    const SCRIPTS = 'scripts';
+
+    if (key === SCRIPTS) {
+      info[SCRIPTS] = { ...info[SCRIPTS], ...content };
+    } else {
+      info[key] = content;
+    }
+    // 清除缓存，因为package.json已经被修改了
+    this._cache = null;
+    tool.writeJSONFileSync(filepath, info);
   }
 }
 
