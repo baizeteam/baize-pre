@@ -1,13 +1,13 @@
 import fs from "fs"
 import path from "path"
-import Storage from "./Storage.mjs";
+import {InstallStore} from "./Storage.mjs";
 import inquirer from "inquirer";
 import Mgr from "./Mgr.mjs";
 import Tool from "./Tool.mjs"
 import Pkg from "./Pkg.mjs"
 
 const tool = new Tool()
-const storage = new Storage()
+const installStore = new InstallStore()
 const mgr = new Mgr()
 
 class Installer {
@@ -112,7 +112,7 @@ class Installer {
   }
   async choose(){
     const questionKey = 'key'
-    const storagePlugins = storage.getPlugins()
+    const storagePlugins = installStore.getPlugins()
     const question = [
       {
         type: 'checkbox',
@@ -126,7 +126,7 @@ class Installer {
       }
     ]
     const answers = await inquirer.prompt(question)
-    const installs = storage.getInstalls()
+    const installs = installStore.getInstalls()
     const matInstalls = installs.filter(item=> answers[questionKey].includes(item.plugin))
     await this.install(matInstalls)
   }
