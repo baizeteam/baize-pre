@@ -126,7 +126,7 @@ class Installer {
       }
     ]
     const answers = await inquirer.prompt(question)
-    const installs = installStore.getInstalls()
+    const installs = installStore.get()
     const matInstalls = installs.filter(item=> answers[questionKey].includes(item.plugin))
     await this.install(matInstalls)
   }

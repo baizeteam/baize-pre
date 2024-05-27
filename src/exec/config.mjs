@@ -13,10 +13,11 @@ const commands = new Commands()
 class Config{
   constructor() {
     this.command = 'config'
+    this.defaultKey = 'default'
     this.args = []
     this.list = []
     this.keys = []
-    this.installs = installStore.getInstalls()
+    this.installs = installStore.get()
     this.plugins = installStore.getPlugins()
   }
   init(args){
@@ -48,8 +49,8 @@ class Config{
         const filepath = path.join(pkg.dirPath, item.config.file)
         try{
           const file = fs.readFileSync(filepath, 'utf-8')
-          console.log(file,'ff')
-          installStore.setInstallConfig(item.plugin, file)
+          console.log(file,'file')
+          installStore.setConfig(item.plugin, file)
         }catch (e){
           return tool.error('Error: read your local file failed.')
         }
@@ -72,6 +73,10 @@ class Config{
     if(this.action === 'get' || this.action === 'set'){
       // console.log(this.action, this.args,'args')
       if(!this.args[1]) return this.#error()
+      if(this.args[1] === installStore.defaultKey){
+        this.list = this.installs
+        return
+      }
       const keys = this.args.slice(1)
       const matInstall = this.installs.filter(item=> keys.includes(item.plugin))
       if(!matInstall.length){

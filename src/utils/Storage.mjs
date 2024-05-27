@@ -4,7 +4,6 @@ import Tool from "./Tool.mjs"
 
 const tool = new Tool()
 
-
 class Storage{
   constructor() {
     const rootPath = tool.node._root
@@ -19,35 +18,40 @@ class Storage{
       throw new Error("Error: " + e)
     }
   }
-    update(content) {
+    update(key, content) {
     // 不要提供全量更改
     const filepath = this.path
-    tool.writeJSONFileSync(filepath, content)
+      const info = this.getInfo()
+      if(!info.key) throw new Error('Error at Storage.update')
+      info[key] = content
+    tool.writeJSONFileSync(filepath, info)
   }
 }
 
-export class InstallStore extends Storage{
+const storage = new Storage()
+
+export class InstallStore{
   constructor() {
-    super();
-    console.log(this.path,'installStorage path')
+    // 恢复默认设置的key
+    this.defaultKey = 'default'
   }
   getPlugins(){
-    const info = this.getInfo()
+    const info = storage.getInfo()
     return info.installs.map(item=> item.plugin)
   }
 
-  getInstalls(){
-    const info = this.getInfo(this.path)
+  get(){
+    const info = storage.getInfo()
     return info.installs
   }
   // single set
-  setInstallConfig(plugin, file){
-    const installs= this.getInstalls()
+  setConfig(plugin, file){
+    const installs= this.get()
     installs.forEach(item => {
       if(item.plugin === plugin){
         item.config.json = file
       }
     })
-    this.update({installs})
+    storage.update('installs', installs)
   }
 }
