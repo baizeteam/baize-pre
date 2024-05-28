@@ -1,6 +1,6 @@
 {
   "name": "dog-pre",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "description": "",
   "scripts": {
     "build": "nodemon",
@@ -18,7 +18,14 @@
   },
   "keywords": [
     "front-end",
+    "front-end base",
+    "husky",
+    "prettier",
+    "husky",
     "basic",
+    "webpack",
+    "vite",
+    "rollup",
     "vue",
     "react",
     "angular"
