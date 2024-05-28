@@ -1,9 +1,10 @@
 {
   "name": "dog-pre",
-  "version": "0.1.1",
+  "version": "0.1.5",
   "description": "",
   "scripts": {
     "build": "nodemon",
+    "publish": "nrm use npm & node auto.mjs & npm publish",
     "format": "prettier --write .",
     "lint-staged": "lint-staged"
   },

@@ -26,7 +26,7 @@
       "plugin": "husky",
       "config": {
         "file": ".husky/pre-commit",
-        "json": "ab"
+        "json": " #!/usr/bin/env sh \n . \"$(dirname -- \"$0\")/_/husky.sh\" \n npm run lint-staged "
       },
       "dev": true,
       "pkg": {
