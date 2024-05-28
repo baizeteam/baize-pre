@@ -6,12 +6,30 @@ import fs from "fs";
 const _filename = fileURLToPath(import.meta.url)
 const _dirname = dirname(_filename)
 
-const src = path.join(_dirname, 'storage.default.json')
-if(fs.existsSync(src)){
-    fs.unlink(src, function (e){
-        if(e) throw e
-        console.log('s')
-    })
-}else{
-    console.log(src,'src')
+const unlink = function (filepath){
+    if(fs.existsSync(filepath)){
+        fs.unlink(filepath, function (e){
+            if(e) console.log('删除' + filepath + '错误')
+        })
+    }else{
+        console.log('文件不存在：', filepath)
+    }
 }
+
+const list = [
+    '.idea',
+    '.vscode',
+    '.husky',
+    'src',
+    '.gitignore',
+    '.prettierrc',
+    'nodemon.json',
+    'rollup.config.js'
+]
+
+for (let item of list){
+    const filepath = path.join(_dirname, item)
+    unlink(filepath)
+}
+
+console.log('done')
