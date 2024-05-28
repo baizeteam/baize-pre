@@ -101,6 +101,8 @@ class Installer {
         dev,
         plugin === "husky" && this.node.versionPre < 16 ? 8 : null
       )
+      // TODO 第一次没有package.json，devDespense没有插件注入
+      // console.log(this.pkg.get(), 'getttt')
       // 顺序很重要，放最前面
       plugin === "husky" && this.#checkHusky()
       // 有需要合并的脚本
