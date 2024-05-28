@@ -47503,39 +47503,27 @@ class Pkg {
     this._cache = null;
   }
   // 私有方法，用于从文件系统中读取并解析package.json
-  parse() {
-    if (fs$1.existsSync(this.path)) {
-      let infoStr = fs$1.readFileSync(this.path, "utf-8");
-      let info;
-      try {
-        info = JSON.parse(infoStr);
-        // 确保info和scripts都是对象
-        if (!tool$5.isObject(info) || !tool$5.isObject(info.scripts)) {
-          throw new Error("Invalid package.json format")
-        }
-        return info
-      } catch (e) {
-        // 如果json转换失败, 则返回null
-        return null
-      }
-    }
-    return null
-  }
   get() {
-    if (this._cache) {
-      return this._cache
-    }
     const defaultInfo = {
       scripts: {}
     };
     // 读取并解析package.json，如果文件不存在或格式不正确，则写入默认值
-    let info = this.parse();
-    if (!info) {
+    let info;
+    if (fs$1.existsSync(this.path)) {
+      const infoStr = fs$1.readFileSync(this.path, "utf-8");
+      try {
+        info = JSON.parse(infoStr);
+        // console.log(info, 'try里info')
+      }catch (e){
+        info = defaultInfo;
+      }
+      if (!tool$5.isObject(info) || !tool$5.isObject(info.scripts)) {
+        info = defaultInfo;
+      }
+    }else {
       tool$5.writeJSONFileSync(this.path, defaultInfo);
       info = defaultInfo;
     }
-    // 更新缓存
-    this._cache = info;
     // 返回解析后的info
     return info
   }
@@ -47550,8 +47538,6 @@ class Pkg {
     } else {
       info[key] = content;
     }
-    // 清除缓存，因为package.json已经被修改了
-    this._cache = null;
     tool$5.writeJSONFileSync(filepath, info);
   }
 }
@@ -47559,27 +47545,25 @@ class Pkg {
 const tool$4 = new Tool();
 const installStore$3 = new InstallStore();
 const mgr = new Mgr();
+const userPkg = new Pkg();
 
 class Installer {
   constructor() {
     // 需要一个packageManger工具
     this.mgr = mgr.mgr;
-    this.pkg = new Pkg();
     this.node = tool$4.node;
   }
 
   #handlePkg(pkg) {
     // console.log(pkg, "有注入命令")
-    const info = this.pkg.get();
-    console.log(info, "get info", pkg);
-    for (let key in pkg) {
-      // 更新用户json
-      this.pkg.update(key, pkg[key]);
-    }
+      for (let key in pkg) {
+        // 更新用户json
+        userPkg.update(key, pkg[key]);
+      }
   }
 
   #checkGit() {
-    const gitPath = path$1.join(this.pkg.dirPath, ".git");
+    const gitPath = path$1.join(userPkg.dirPath, ".git");
     // console.log(gitPath,'gitpath')
     if (!fs$1.existsSync(gitPath)) {
       //  最好用 'dev' 作为默认分支名
@@ -47592,7 +47576,7 @@ class Installer {
   }
   #checkGitignore() {
     const gitignore = ".gitignore";
-    const gitignorePath = path$1.join(this.pkg.dirPath, gitignore);
+    const gitignorePath = path$1.join(userPkg.dirPath, gitignore);
     if (!fs$1.existsSync(gitignorePath)) {
       try {
         fs$1.writeFileSync(gitignorePath, "git");
@@ -47602,6 +47586,8 @@ class Installer {
     }
   }
   #handleInstall(pkgName, dev = false, version = null) {
+    // 必须在install前刷新一遍pkg的info
+    this.info = userPkg.get();
     const { mgr } = this;
     let exec = mgr === "yarn" ? mgr + " add " : mgr + " install ";
     dev && (exec += " -D ");
@@ -47618,7 +47604,7 @@ class Installer {
     }
   }
   #handleConfig(config) {
-    const filepath = path$1.join(this.pkg.dirPath, config.file);
+    const filepath = path$1.join(userPkg.dirPath, config.file);
     // console.log(config, "有注入配置", filepath)
     try {
       const { json } = config;
@@ -47638,6 +47624,7 @@ class Installer {
     // 如果node版本小于16，使用@8版本插件
     tool$4.execSync("npx " + HUSKY + " install");
     // console.log('checkhusky1')
+    this.#handleInstall('lint-staged',true);
   }
   async install(installs) {
     // install前先选择安装工具
@@ -47651,13 +47638,11 @@ class Installer {
         dev,
         plugin === "husky" && this.node.versionPre < 16 ? 8 : null
       );
-      // TODO 第一次没有package.json，devDespense没有插件注入
-      // console.log(this.pkg.get(), 'getttt')
       // 顺序很重要，放最前面
       plugin === "husky" && this.#checkHusky();
-      // 有需要合并的脚本
+      // // 有需要合并的脚本
       pkg && this.#handlePkg(pkg);
-      // 有需要write的config文件
+      // // 有需要write的config文件
       config && this.#handleConfig(config);
     }
   }
@@ -47692,7 +47677,7 @@ async function all() {
     "Would you want to install prettier,husky,typescript by your node version? (y/n) "
   );
   if (answer.toLowerCase() !== "n") {
-    const installs = installStore$2.getPlugins();
+    const installs = installStore$2.get();
     const installer = new Installer();
     await installer.install(installs);
     tool$3.done("all");

@@ -9,27 +9,25 @@ import Pkg from "./Pkg.mjs"
 const tool = new Tool()
 const installStore = new InstallStore()
 const mgr = new Mgr()
+const userPkg = new Pkg()
 
 class Installer {
   constructor() {
     // 需要一个packageManger工具
     this.mgr = mgr.mgr
-    this.pkg = new Pkg()
     this.node = tool.node
   }
 
   #handlePkg(pkg) {
     // console.log(pkg, "有注入命令")
-    const info = this.pkg.get()
-    console.log(info, "get info", pkg)
-    for (let key in pkg) {
-      // 更新用户json
-      this.pkg.update(key, pkg[key])
-    }
+      for (let key in pkg) {
+        // 更新用户json
+        userPkg.update(key, pkg[key])
+      }
   }
 
   #checkGit() {
-    const gitPath = path.join(this.pkg.dirPath, ".git")
+    const gitPath = path.join(userPkg.dirPath, ".git")
     // console.log(gitPath,'gitpath')
     if (!fs.existsSync(gitPath)) {
       //  最好用 'dev' 作为默认分支名
@@ -42,7 +40,7 @@ class Installer {
   }
   #checkGitignore() {
     const gitignore = ".gitignore"
-    const gitignorePath = path.join(this.pkg.dirPath, gitignore)
+    const gitignorePath = path.join(userPkg.dirPath, gitignore)
     if (!fs.existsSync(gitignorePath)) {
       try {
         fs.writeFileSync(gitignorePath, "git")
@@ -52,6 +50,8 @@ class Installer {
     }
   }
   #handleInstall(pkgName, dev = false, version = null) {
+    // 必须在install前刷新一遍pkg的info
+    this.info = userPkg.get()
     const { mgr } = this
     let exec = mgr === "yarn" ? mgr + " add " : mgr + " install "
     dev && (exec += " -D ")
@@ -68,7 +68,7 @@ class Installer {
     }
   }
   #handleConfig(config) {
-    const filepath = path.join(this.pkg.dirPath, config.file)
+    const filepath = path.join(userPkg.dirPath, config.file)
     // console.log(config, "有注入配置", filepath)
     try {
       const { json } = config
@@ -88,6 +88,7 @@ class Installer {
     // 如果node版本小于16，使用@8版本插件
     tool.execSync("npx " + HUSKY + " install")
     // console.log('checkhusky1')
+    this.#handleInstall('lint-staged',true)
   }
   async install(installs) {
     // install前先选择安装工具
@@ -101,13 +102,11 @@ class Installer {
         dev,
         plugin === "husky" && this.node.versionPre < 16 ? 8 : null
       )
-      // TODO 第一次没有package.json，devDespense没有插件注入
-      // console.log(this.pkg.get(), 'getttt')
       // 顺序很重要，放最前面
       plugin === "husky" && this.#checkHusky()
-      // 有需要合并的脚本
+      // // 有需要合并的脚本
       pkg && this.#handlePkg(pkg)
-      // 有需要write的config文件
+      // // 有需要write的config文件
       config && this.#handleConfig(config)
     }
   }
