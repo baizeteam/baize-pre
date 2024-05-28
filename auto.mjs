@@ -20,6 +20,7 @@ const unlink = function (filepath){
 }
 
 const list = [
+    "bin/build.cjs.map",
     '.idea',
     '.vscode',
     '.husky',
