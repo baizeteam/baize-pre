@@ -10,7 +10,7 @@ async function all() {
     "Would you want to install prettier,husky,typescript by your node version? (y/n) "
   )
   if (answer.toLowerCase() !== "n") {
-    const installs = installStore.getPlugins()
+    const installs = installStore.get()
     const installer = new Installer()
     await installer.install(installs)
     tool.done("all")
