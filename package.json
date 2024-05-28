@@ -40,6 +40,7 @@
   "dependencies": {
     "chalk": "^4.1.2",
     "commander": "^11.1.0",
+    "fs-extra": "^11.2.0",
     "inquirer": "^8.2.6",
     "readline-sync": "^1.4.10"
   },

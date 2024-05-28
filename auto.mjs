@@ -2,15 +2,18 @@ import { fileURLToPath } from "url"
 import { dirname } from "path"
 import * as path from "path"
 import fs from "fs";
+import fsExtra from 'fs-extra'
 
 const _filename = fileURLToPath(import.meta.url)
 const _dirname = dirname(_filename)
 
 const unlink = function (filepath){
     if(fs.existsSync(filepath)){
-        fs.unlink(filepath, function (e){
-            if(e) console.log('删除' + filepath + '错误')
-        })
+        try {
+            fsExtra.removeSync(filepath)
+        }catch (e){
+            console.log('删除 ' + filepath + ' 错误')
+        }
     }else{
         console.log('文件不存在：', filepath)
     }
@@ -24,7 +27,8 @@ const list = [
     '.gitignore',
     '.prettierrc',
     'nodemon.json',
-    'rollup.config.js'
+    'rollup.config.js',
+    'package-lock.json',
 ]
 
 for (let item of list){
