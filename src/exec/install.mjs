@@ -13,9 +13,9 @@ async function install(args) {
   // TODO 但是多个安装里，有一个错误，应该给到提示
   const matInstalls = installs.filter((item) => args.includes(item.plugin))
   if (!matInstalls.length) {
-    const argStr = args.join(" | ")
+    const pluginStr = installStore.getPlugins().join(" | ").trim()
     return tool.error(
-      "dog " + "not allow to installed " + argStr.trim() || undefined
+      "Error: dog " + "is only allow to install " + pluginStr + ' .'
     )
   }
   const installer = new Installer()

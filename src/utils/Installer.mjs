@@ -77,7 +77,7 @@ class Installer {
       // console.log(filepath,'filepath')
     } catch (e) {
       // console.log(filepath,'失败 filepath')
-      return tool.error("注入配置失败")
+      return tool.error("Error: Inject config error in handleConfig.")
     }
   }
   #checkHusky() {
