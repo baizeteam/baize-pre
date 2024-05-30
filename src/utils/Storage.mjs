@@ -65,7 +65,11 @@ export class InstallStore {
   }
   // single set
   setConfig(plugin, file) {
-    if(plugin === this.key1) return storage.update(this.key1, file)
+    if(plugin === this.key1) {
+      const gitignore = this.getGitignore()
+      gitignore.json = file
+      return storage.update(this.key1, gitignore)
+    }
     const installs = this.get()
     installs.forEach((item) => {
       if (item.plugin === plugin) item.config.json = file

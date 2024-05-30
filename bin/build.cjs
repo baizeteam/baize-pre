@@ -6736,7 +6736,10 @@ class Storage {
   constructor() {
     const rootPath = tool$7.node._root;
     this.path = path__namespace.join(rootPath, "storage.json");
-    this.defaultPath = path__namespace.join(rootPath, "storage.default.json");
+    this.default = {
+      path: path__namespace.join(rootPath, "storage.default.json"),
+      key: 'default'
+    };
     // console.log(this.path,'Storage path')
   }
   getByPath(filepath) {
@@ -6760,35 +6763,46 @@ class Storage {
   }
 }
 
+
 const storage = new Storage();
 
 class InstallStore {
   constructor() {
-    // 恢复默认设置的key
-    this.defaultKey = "default";
+    this.key = 'installs';
+    this.key1 = 'gitignore';
+    this.default = storage.default;
   }
   getPlugins() {
     const info = storage.get();
-    return info.installs.map((item) => item.plugin)
+    return info[this.key].map((item) => item.plugin)
+  }
+
+  getGitignore(){
+    const info = storage.get();
+    return info[this.key1]
   }
 
   get() {
     const info = storage.get();
-    return info.installs
+    return info[this.key]
   }
   reset() {
-    const defaultInfo = storage.getByPath(storage.defaultPath);
-    storage.update("installs", defaultInfo.installs);
+    const defaultInfo = storage.getByPath(storage.default.path);
+    storage.update(this.key, defaultInfo[this.key]);
+    storage.update(this.key1, defaultInfo[this.key1]);
   }
   // single set
   setConfig(plugin, file) {
+    if(plugin === this.key1) {
+      const gitignore = this.getGitignore();
+      gitignore.json = file;
+      return storage.update(this.key1, gitignore)
+    }
     const installs = this.get();
     installs.forEach((item) => {
-      if (item.plugin === plugin) {
-        item.config.json = file;
-      }
+      if (item.plugin === plugin) item.config.json = file;
     });
-    storage.update("installs", installs);
+    storage.update(this.key, installs);
   }
 }
 
@@ -47575,13 +47589,13 @@ class Installer {
     }
   }
   #checkGitignore() {
-    const gitignore = ".gitignore";
-    const gitignorePath = path$1.join(userPkg.dirPath, gitignore);
-    if (!fs$1.existsSync(gitignorePath)) {
+    const gitignore = installStore$3.getGitignore();
+    const filepath = path$1.join(userPkg.dirPath, gitignore.file);
+    if (!fs$1.existsSync(filepath)) {
       try {
-        fs$1.writeFileSync(gitignorePath, "git");
+        fs$1.writeFileSync(filepath, gitignore.json);
       } catch (e) {
-        tool$4.error(gitignore);
+        tool$4.error("Error to wrote " + filepath);
       }
     }
   }
@@ -47723,11 +47737,24 @@ const commands = new Commands();
 class Config {
   constructor() {
     this.command = "config";
-    this.default = false; // default状态
+    this.isDefault = false; // default状态
     this.args = [];
     this.list = [];
     this.keys = [];
-    this.installs = installStore.get();
+    const installs = installStore.get().map((item) => ({
+      name: item.plugin,
+      config: JSON.stringify(item.config.json),
+      file: item.config.file
+    }));
+    // 合并gitignore的信息
+    const gitignore = installStore.getGitignore();
+    this.allConfigs = installs.concat([
+        {
+          name: installStore.key1,
+          config: gitignore.json,
+          file: gitignore.file
+        }
+    ]);
     this.plugins = installStore.getPlugins();
   }
   init(args) {
@@ -47740,18 +47767,13 @@ class Config {
     this[this.action](); // get or set, 此时arg[1]必有
   }
   get() {
-    const reduceList = this[this.default ? "installs" : "list"].map((item) => ({
-      name: item.plugin,
-      config: JSON.stringify(item.config.json)
-    }));
-    if (this.default) {
-      this.default = false;
-    }
+    const reduceList = this.isDefault ? this.allConfigs : this.list;
+    if (this.isDefault) ;
     return console.log(reduceList)
   }
   set() {
-    // set default的判断
-    if (this.default) {
+    // set default (恢复默认) 的判断
+    if (this.isDefault) {
       const answer = readlineSync.question(
         "Would you want to set default config ? (y/n)"
       );
@@ -47765,28 +47787,26 @@ class Config {
       } else {
         tool.warn("Cancel to set.");
       }
-      this.default = false;
-    } else {
-      const keyStr = this.keys.join(",");
-      // console.log(keyStr, 'keyStr')
-      const answer = readlineSync.question(
+     return  this.isDefault = false
+    }
+
+    const keyStr = this.keys.join(",");
+    // console.log(keyStr, 'keyStr')
+    const answer = readlineSync.question(
         "Would you want to set " + keyStr + " form your local files ? (y/n)"
-      );
-      if (answer.toLowerCase() !== "n") {
-        this.list.forEach((item) => {
-          const filepath = path$1.join(pkg.dirPath, item.config.file);
-          try {
-            const file = fs$1.readFileSync(filepath, "utf-8");
-            // console.log(file,'file')
-            installStore.setConfig(item.plugin, file);
-            tool.success("Successfully.");
-          } catch (e) {
-            return tool.error("Error: read your local file failed.")
-          }
-        });
-      } else {
-        tool.warn("Cancel to set.");
+    );
+    if (answer.toLowerCase() !== "n") {
+      for(let item of this.list){
+        const filepath = path$1.join(pkg.dirPath, item.file);
+        // console.log(filepath,'filepath')
+        if(!fs$1.existsSync(filepath)) return tool.error("Error: read your local file failed.")
+        const file = fs$1.readFileSync(filepath, "utf-8");
+        // console.log(file,'file')
+        installStore.setConfig(item.name, file);
+        tool.success("Successfully.");
       }
+    } else {
+      tool.warn("Cancel to set.");
     }
   }
   #error() {
@@ -47804,12 +47824,12 @@ class Config {
     if (this.action === "get" || this.action === "set") {
       // console.log(this.action, this.args,'args')
       if (!this.args[1]) return this.#error()
-      if (this.args[1] === installStore.defaultKey) {
-        return (this.default = true)
+      if (this.args[1] === installStore.default.key) {
+        return (this.isDefault = true)
       }
       const keys = this.args.slice(1);
-      const matInstall = this.installs.filter((item) =>
-        keys.includes(item.plugin)
+      const matInstall = this.allConfigs.filter((item) =>
+        keys.includes(item.name)
       );
       if (!matInstall.length) {
         throw new Error(
@@ -47819,6 +47839,7 @@ class Config {
             "】"
         )
       }
+      // console.log(matInstall,'matInstall')
       this.list = matInstall;
       this.keys = keys;
     }

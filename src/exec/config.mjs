@@ -17,7 +17,20 @@ class Config {
     this.args = []
     this.list = []
     this.keys = []
-    this.installs = installStore.get()
+    const installs = installStore.get().map((item) => ({
+      name: item.plugin,
+      config: JSON.stringify(item.config.json),
+      file: item.config.file
+    }))
+    // 合并gitignore的信息
+    const gitignore = installStore.getGitignore()
+    this.allConfigs = installs.concat([
+        {
+          name: installStore.key1,
+          config: gitignore.json,
+          file: gitignore.file
+        }
+    ])
     this.plugins = installStore.getPlugins()
   }
   init(args) {
@@ -30,17 +43,13 @@ class Config {
     this[this.action]() // get or set, 此时arg[1]必有
   }
   get() {
-    const reduceList = this[this.isDefault ? "installs" : "list"].map((item) => ({
-      name: item.plugin,
-      config: JSON.stringify(item.config.json)
-    }))
+    const reduceList = this.isDefault ? this.allConfigs : this.list
     if (this.isDefault) {
-      this.isDefault = false
     }
     return console.log(reduceList)
   }
   set() {
-    // set default的判断
+    // set default (恢复默认) 的判断
     if (this.isDefault) {
       const answer = readlineSync.question(
         "Would you want to set default config ? (y/n)"
@@ -55,28 +64,26 @@ class Config {
       } else {
         tool.warn("Cancel to set.")
       }
-      this.isDefault = false
-    } else {
-      const keyStr = this.keys.join(",")
-      // console.log(keyStr, 'keyStr')
-      const answer = readlineSync.question(
+     return  this.isDefault = false
+    }
+
+    const keyStr = this.keys.join(",")
+    // console.log(keyStr, 'keyStr')
+    const answer = readlineSync.question(
         "Would you want to set " + keyStr + " form your local files ? (y/n)"
-      )
-      if (answer.toLowerCase() !== "n") {
-        this.list.forEach((item) => {
-          const filepath = path.join(pkg.dirPath, item.config.file)
-          try {
-            const file = fs.readFileSync(filepath, "utf-8")
-            // console.log(file,'file')
-            installStore.setConfig(item.plugin, file)
-            tool.success("Successfully.")
-          } catch (e) {
-            return tool.error("Error: read your local file failed.")
-          }
-        })
-      } else {
-        tool.warn("Cancel to set.")
+    )
+    if (answer.toLowerCase() !== "n") {
+      for(let item of this.list){
+        const filepath = path.join(pkg.dirPath, item.file)
+        // console.log(filepath,'filepath')
+        if(!fs.existsSync(filepath)) return tool.error("Error: read your local file failed.")
+        const file = fs.readFileSync(filepath, "utf-8")
+        // console.log(file,'file')
+        installStore.setConfig(item.name, file)
+        tool.success("Successfully.")
       }
+    } else {
+      tool.warn("Cancel to set.")
     }
   }
   #error() {
@@ -98,8 +105,8 @@ class Config {
         return (this.isDefault = true)
       }
       const keys = this.args.slice(1)
-      const matInstall = this.installs.filter((item) =>
-        keys.includes(item.plugin)
+      const matInstall = this.allConfigs.filter((item) =>
+        keys.includes(item.name)
       )
       if (!matInstall.length) {
         throw new Error(
@@ -109,6 +116,7 @@ class Config {
             "】"
         )
       }
+      // console.log(matInstall,'matInstall')
       this.list = matInstall
       this.keys = keys
     }

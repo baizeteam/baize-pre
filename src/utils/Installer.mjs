@@ -39,13 +39,13 @@ class Installer {
     }
   }
   #checkGitignore() {
-    const gitignore = installStore.key1
-    const gitignorePath = path.join(userPkg.dirPath, gitignore)
-    if (!fs.existsSync(gitignorePath)) {
+    const gitignore = installStore.getGitignore()
+    const filepath = path.join(userPkg.dirPath, gitignore.file)
+    if (!fs.existsSync(filepath)) {
       try {
-        fs.writeFileSync(gitignorePath, installStore.getGitignore())
+        fs.writeFileSync(filepath, gitignore.json)
       } catch (e) {
-        tool.error("Error to wrote " + gitignore)
+        tool.error("Error to wrote " + filepath)
       }
     }
   }
