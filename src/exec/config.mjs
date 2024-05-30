@@ -13,7 +13,7 @@ const commands = new Commands()
 class Config {
   constructor() {
     this.command = "config"
-    this.default = false // default状态
+    this.isDefault = false // default状态
     this.args = []
     this.list = []
     this.keys = []
@@ -30,18 +30,18 @@ class Config {
     this[this.action]() // get or set, 此时arg[1]必有
   }
   get() {
-    const reduceList = this[this.default ? "installs" : "list"].map((item) => ({
+    const reduceList = this[this.isDefault ? "installs" : "list"].map((item) => ({
       name: item.plugin,
       config: JSON.stringify(item.config.json)
     }))
-    if (this.default) {
-      this.default = false
+    if (this.isDefault) {
+      this.isDefault = false
     }
     return console.log(reduceList)
   }
   set() {
     // set default的判断
-    if (this.default) {
+    if (this.isDefault) {
       const answer = readlineSync.question(
         "Would you want to set default config ? (y/n)"
       )
@@ -55,7 +55,7 @@ class Config {
       } else {
         tool.warn("Cancel to set.")
       }
-      this.default = false
+      this.isDefault = false
     } else {
       const keyStr = this.keys.join(",")
       // console.log(keyStr, 'keyStr')
@@ -94,8 +94,8 @@ class Config {
     if (this.action === "get" || this.action === "set") {
       // console.log(this.action, this.args,'args')
       if (!this.args[1]) return this.#error()
-      if (this.args[1] === installStore.defaultKey) {
-        return (this.default = true)
+      if (this.args[1] === installStore.default.key) {
+        return (this.isDefault = true)
       }
       const keys = this.args.slice(1)
       const matInstall = this.installs.filter((item) =>

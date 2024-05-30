@@ -58,5 +58,6 @@
       "dev": true,
       "pkg": {}
     }
-  ]
+  ],
+  "gitignore": "logs\n*.log\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\npnpm-debug.log*\nlerna-debug.log*\nnode_modules\n.DS_Store\ndist\n*.local\n\n# Editor directories and files\n.idea\n*.suo\n.vsocde\n.hbuilder\n*.ntvs*\n*.njsproj\n*.sln\n*.sw?"
 }

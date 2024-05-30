@@ -8,7 +8,10 @@ class Storage {
   constructor() {
     const rootPath = tool.node._root
     this.path = path.join(rootPath, "storage.json")
-    this.defaultPath = path.join(rootPath, "storage.default.json")
+    this.default = {
+      path: path.join(rootPath, "storage.default.json"),
+      key: 'default'
+    }
     // console.log(this.path,'Storage path')
   }
   getByPath(filepath) {
@@ -32,34 +35,42 @@ class Storage {
   }
 }
 
+
 const storage = new Storage()
 
 export class InstallStore {
   constructor() {
-    // 恢复默认设置的key
-    this.defaultKey = "default"
+    this.key = 'installs'
+    this.key1 = 'gitignore'
+    this.default = storage.default
   }
   getPlugins() {
     const info = storage.get()
-    return info.installs.map((item) => item.plugin)
+    return info[this.key].map((item) => item.plugin)
+  }
+
+  getGitignore(){
+    const info = storage.get()
+    return info[this.key1]
   }
 
   get() {
     const info = storage.get()
-    return info.installs
+    return info[this.key]
   }
   reset() {
-    const defaultInfo = storage.getByPath(storage.defaultPath)
-    storage.update("installs", defaultInfo.installs)
+    const defaultInfo = storage.getByPath(storage.default.path)
+    storage.update(this.key, defaultInfo[this.key])
+    storage.update(this.key1, defaultInfo[this.key1])
   }
   // single set
   setConfig(plugin, file) {
+    if(plugin === this.key1) return storage.update(this.key1, file)
     const installs = this.get()
     installs.forEach((item) => {
-      if (item.plugin === plugin) {
-        item.config.json = file
-      }
+      if (item.plugin === plugin) item.config.json = file
     })
-    storage.update("installs", installs)
+    storage.update(this.key, installs)
   }
 }
+
