@@ -30,6 +30,7 @@ const list = [
     'nodemon.json',
     'rollup.config.js',
     'package-lock.json',
+    'pnpm-lock.yaml',
     'auto.mjs'
 ]
 
