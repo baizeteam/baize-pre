@@ -13,7 +13,7 @@ async function all() {
     const installs = installStore.get()
     const installer = new Installer()
     await installer.install(installs)
-    tool.done("all")
+    tool.done(all.name)
   } else {
     tool.warn("Cancel to install.")
   }

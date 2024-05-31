@@ -20,7 +20,7 @@ async function install(args) {
   }
   const installer = new Installer()
   await installer.install(matInstalls)
-  tool.done("all")
+  tool.done(install.name)
 }
 
 export default install

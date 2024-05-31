@@ -7,7 +7,7 @@ class Commands {
   resolve() {
     return {
       init: {
-        alias: "ini",
+        alias: "",
         description:
           "Choose multiple plugins to install and config with your node version.",
         examples: [this.main + "init"]
@@ -15,13 +15,17 @@ class Commands {
       install: {
         alias: "i",
         description:
-          "Choose single plugin to install and config with your node version.",
+          "Install add config some plugins with your node version.",
         examples: [this.main + "i <plugin-name>"]
+      },
+      uninstall: {
+        alias:"",
+        description: "Uninstall some plugins add remove the config with your node version.",
       },
       all: {
         alias: "a",
         description:
-          "Quickly install all plugins and config with your node version.",
+          "Quickly install all plugins and config them with your node version.",
         examples: [this.main + "all"]
       },
       config: {

@@ -1,6 +1,6 @@
 {
   "name": "baize-pre",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "",
   "scripts": {
     "build:watch": "nodemon",
@@ -15,7 +15,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/coderwhytop/dog-pre"
+    "url": "https://gitee.com/coderwhytop/baize-pre"
   },
   "keywords": [
     "front-end",

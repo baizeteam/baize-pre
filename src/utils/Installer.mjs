@@ -19,6 +19,7 @@ class Installer {
   }
 
   #handlePkg(pkg) {
+    userPkg.get()
     // console.log(pkg, "有注入命令")
       for (let key in pkg) {
         // 更新用户json
@@ -27,6 +28,7 @@ class Installer {
   }
 
   #checkGit() {
+    userPkg.get()
     const gitPath = path.join(userPkg.dirPath, ".git")
     // console.log(gitPath,'gitpath')
     if (!fs.existsSync(gitPath)) {
@@ -39,6 +41,7 @@ class Installer {
     }
   }
   #checkGitignore() {
+    userPkg.get()
     const gitignore = installStore.getGitignore()
     const filepath = path.join(userPkg.dirPath, gitignore.file)
     if (!fs.existsSync(filepath)) {
@@ -50,8 +53,8 @@ class Installer {
     }
   }
   #handleInstall(pkgName, dev = false, version = null) {
-    // 必须在install前刷新一遍pkg的info
-    this.info = userPkg.get()
+    /** 必须在install前刷新一遍pkg的info,避免npm 安装时写入和我们的写入顺序冲掉了 */
+    userPkg.get()
     const { mgr } = this
     let exec = mgr === "yarn" ? mgr + " add " : mgr + " install "
     dev && (exec += " -D ")
@@ -63,11 +66,27 @@ class Installer {
       tool.execSync(exec)
       tool.success("Installed " + pkgName + " successfully. ")
     } catch (e) {
-      tool.error("Failed to Install " + pkgName + " : ")
+      tool.error("Error: install " + pkgName + " : ")
+      console.log(e) // 承接上一行错误，但不要颜色打印
+    }
+  }
+  #handleUninstall(pkgName) {
+    userPkg.get()
+    const { mgr } = this
+    let exec = mgr === "yarn" ? mgr + " remove " : mgr + " uninstall "
+    exec += pkgName
+    try {
+      // 捕获安装错误
+      tool.warn("Uninstalling " + pkgName + " ... ")
+      tool.execSync(exec)
+      tool.success("Uninstalled " + pkgName + " successfully. ")
+    } catch (e) {
+      tool.error("Error: uninstall " + pkgName + " : ")
       console.log(e) // 承接上一行错误，但不要颜色打印
     }
   }
   #handleConfig(config) {
+    userPkg.get()
     const filepath = path.join(userPkg.dirPath, config.file)
     // console.log(config, "有注入配置", filepath)
     try {
@@ -77,7 +96,7 @@ class Installer {
       // console.log(filepath,'filepath')
     } catch (e) {
       // console.log(filepath,'失败 filepath')
-      return tool.error("Error: Inject config error in handleConfig.")
+      return tool.error("Error: inject config error in handleConfig.")
     }
   }
   #checkHusky() {
@@ -108,6 +127,19 @@ class Installer {
       pkg && this.#handlePkg(pkg)
       // // 有需要write的config文件
       config && this.#handleConfig(config)
+    }
+  }
+  async uninstall(installs){
+    // 卸载插件以及插件配置文件，由于包管理工具机制，比如你用npm安装，用yarn卸载某项，yarn执行完毕会去安装全部插件
+    // 如果用户的包管理工具不一致，用户自己选择的，不能怪我们
+    await mgr.choose()
+    this.mgr = mgr.mgr
+    // console.log(installs, 'uninstall')
+    for(let item of installs){
+      const { plugin } = item
+      this.#handleInstall(plugin)
+      // 移除配置项
+
     }
   }
   async choose() {
