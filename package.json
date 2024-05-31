@@ -3,8 +3,9 @@
   "version": "0.2.5",
   "description": "",
   "scripts": {
-    "build": "nodemon",
-    "finish": "node auto.mjs",
+    "build:watch": "nodemon",
+    "build": "rollup -c",
+    "finish": "npm run build && node auto.mjs",
     "format": "prettier --write .",
     "lint-staged": "lint-staged"
   },
