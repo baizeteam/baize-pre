@@ -41,15 +41,6 @@ class Tool {
   writeJSONFileSync(path, content) {
     fs.writeFileSync(path, JSON.stringify(content, null, 2))
   }
-  getFileExt(path) {
-    // 使用lastIndexOf()找到最后一个'.'的位置
-    const dotIndex = path.lastIndexOf(".")
-    // 如果'.'不存在于路径中，则返回空字符串
-    if (dotIndex === -1)
-      throw new Error('The filepath "' + path + ' " without extension.')
-    // 使用slice()方法获取从最后一个'.'到字符串末尾的部分
-    return path.slice(dotIndex + 1)
-  }
   success(s, bold) {
     return logger("success", s, bold)
   }

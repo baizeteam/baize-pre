@@ -7,7 +7,7 @@ const tool = new Tool()
 const installStore = new InstallStore()
 async function all() {
   const answer = readlineSync.question(
-    "Would you want to install prettier,husky,typescript by your node version? (y/n) "
+    "Would you like to install prettier, husky, and typescript that work with your Node.js version? (y/n) "
   )
   if (answer.toLowerCase() !== "n") {
     const installs = installStore.get()
@@ -15,7 +15,7 @@ async function all() {
     await installer.install(installs)
     tool.done(all.name)
   } else {
-    tool.warn("Cancel to install.")
+    tool.warn("Cancel the installation")
   }
 }
 

@@ -48,7 +48,7 @@ class Installer {
       try {
         fs.writeFileSync(filepath, gitignore.json)
       } catch (e) {
-        tool.error("Error to wrote " + filepath)
+        tool.error("Failed to write to " + filepath)
       }
     }
   }
@@ -96,7 +96,7 @@ class Installer {
       // console.log(filepath,'filepath')
     } catch (e) {
       // console.log(filepath,'失败 filepath')
-      return tool.error("Error: inject config error in handleConfig.")
+      return tool.error("Internal Error: Configuration injection failed in handleConfig.")
     }
   }
   #checkHusky() {
@@ -149,7 +149,7 @@ class Installer {
       {
         type: "checkbox",
         name: questionKey,
-        message: "Choose the plugins what you want to install.",
+        message: "Choose the plugins you want to install.",
         choices: storagePlugins,
         validate(answers) {
           if (!answers.length) return "You must choose at least one plugin."

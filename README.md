@@ -21,19 +21,26 @@
 
 ## 优势
 
-侵入成本小，新项目一键搞定，无心智负担。自定义配置，多种场景多种命令匹配。体积小，脚手架2M不到
+- 侵入成本小，新项目一键搞定，无心智负担
+- 渐进式命令init和install，无论新老项目皆可以
+- 自定义配置，多种场景多种命令匹配
+- 体积小，脚手架2M不到
+- 不关心平台和前端框架，只要有node，几乎支持配置前端所有框架的项目规范
 
 ## 功能实现
 
-- init: Choose multiple plugins to install add config with your node version.
-- install: Choose single plugin to install and config with your node version.
-- all: Quickly install all plugins and config with your node version.
-- config: Configure the cli variable. Once config, use everywhere.
+- init: Choose and install multiple plugins, and configure them according to your Node.js version.
+- install: Install and configure some plugins compatible with your Node.js version.
+- uninstall: Uninstall some plugins and remove their configuration settings that are related to your Node.js version.
+- all: Quickly install all plugins and configure them with your Node.js version.
+- config: Configure the CLI variable. Once configured, use it everywhere.
+- -h: View help.
+- -V: View current version.
 
 ## 依赖插件
 
 - commander: 参数解析
-- inquirer: 选项交互式工具，有他就可以实现命令行的选项
+- inquirer: 选项交互式工具，有它就可以实现命令行的选项
 - chalk: 粉笔帮我们在控制台画出各种各样的颜色
 - readline-sync：询问式交互工具
 
@@ -44,4 +51,4 @@
 
 ## TODO
 - 搜寻意见，是需要做“一个项目选择一次包管理工具”，还是“该项目每次安装都需要询问包管理工具”。
-- 使用TS重构(配置alias路径)
+- 使用TS重构(并配置alias路径)

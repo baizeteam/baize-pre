@@ -52,7 +52,7 @@ class Config {
     // set default (恢复默认) 的判断
     if (this.isDefault) {
       const answer = readlineSync.question(
-        "Would you want to set default config ? (y/n)"
+        "Would you like to set the default config ? (y/n)"
       )
       if (answer.toLowerCase() !== "n") {
         try {
@@ -62,15 +62,15 @@ class Config {
           tool.error("Error: " + e)
         }
       } else {
-        tool.warn("Cancel to set.")
+        tool.warn("Cancel the setting process.")
       }
      return  this.isDefault = false
     }
 
-    const keyStr = this.keys.join(",")
+    const keyStr = this.keys.join(",").trim()
     // console.log(keyStr, 'keyStr')
     const answer = readlineSync.question(
-        "Would you want to set " + keyStr + " form your local files ? (y/n)"
+        'Would you like to set " ' + keyStr + ' " for your local files? (y/n)'
     )
     if (answer.toLowerCase() !== "n") {
       for(let item of this.list){
@@ -83,14 +83,14 @@ class Config {
         tool.success("Successfully.")
       }
     } else {
-      tool.warn("Cancel to set.")
+      tool.warn("Cancel the setting process.")
     }
   }
   #error() {
     const complete =
       '"' + commands.main + this.command + " " + this.args.join(" ") + '"'
-    const example = commands.resolve()[this.command].examples.join(" | ")
-    const msg = "Error command. Expected " + example + " , got " + complete
+    const example = commands.resolve()[this.command].examples.join(" | ").trim()
+    const msg = 'Error command. Expected " ' + example + ' ", got ' + complete
     throw new Error(msg)
   }
   #check() {
@@ -110,10 +110,9 @@ class Config {
       )
       if (!matInstall.length) {
         throw new Error(
-          "Key is not found." +
-            "Try to get 【" +
-            this.plugins.join(" | ") +
-            "】"
+          'Key is not found.' +
+            'Try to get the key "' +
+            this.plugins.join(" | ").trim()  + ' "'
         )
       }
       // console.log(matInstall,'matInstall')

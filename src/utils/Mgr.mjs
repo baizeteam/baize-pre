@@ -30,8 +30,8 @@ class Mgr {
     const nodePreV = tool.node.versionPre
     const nodeV = tool.node.version
     if (nodePreV < 16 && mgr === pnpm) {
-      tool.error("Sorry, your node version is not support to " + pnpm)
-      return tool.error("Expected >= 16, but got " + nodeV)
+      tool.error('Sorry, your Node.js version is not supported by "' + pnpm + '".')
+      return tool.error('Expected >= 16, but got "' + nodeV + '".')
     }
   }
 }

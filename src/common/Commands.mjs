@@ -9,28 +9,28 @@ class Commands {
       init: {
         alias: "",
         description:
-          "Choose multiple plugins to install and config with your node version.",
+          "Choose and install multiple plugins, and configure them according to your Node.js version.",
         examples: [this.main + "init"]
       },
       install: {
         alias: "i",
         description:
-          "Install add config some plugins with your node version.",
+          "Install and configure some plugins compatible with your Node.js version.",
         examples: [this.main + "i <plugin-name>"]
       },
       uninstall: {
         alias:"",
-        description: "Uninstall some plugins add remove the config with your node version.",
+        description: "Uninstall some plugins and remove their configuration settings that are related to your Node.js version.",
       },
       all: {
         alias: "a",
         description:
-          "Quickly install all plugins and config them with your node version.",
+          "Quickly install all plugins and configure them with your Node.js version.",
         examples: [this.main + "all"]
       },
       config: {
         alias: "conf",
-        description: "Configure the cli variable. Once config, use everywhere.",
+        description: "Configure the CLI variable. Once configured, use it everywhere.",
         examples: [
           this.main + "config set <k> <v>",
           this.main + "config get <k>"
