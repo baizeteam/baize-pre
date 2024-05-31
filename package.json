@@ -1,5 +1,5 @@
 {
-  "name": "dog-pre",
+  "name": "baize-pre",
   "version": "0.2.5",
   "description": "",
   "scripts": {
@@ -9,7 +9,7 @@
     "lint-staged": "lint-staged"
   },
   "bin": {
-    "dog": "/bin/build.cjs"
+    "baize": "/bin/build.cjs"
   },
   "type": "module",
   "repository": {

@@ -15,7 +15,7 @@ function main() {
   const commands = new Commands()
   const commandResolves = commands.resolve()
   // 设置命令在前，选项在后
-  program.version("dog-pre" + "@" + myPkg.version).usage("<command> [option]")
+  program.version("baize-pre" + "@" + myPkg.version).usage("<command> [option]")
   for (let key in commandResolves) {
     const { alias, description } = commandResolves[key]
     program
