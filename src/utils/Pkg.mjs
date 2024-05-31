@@ -3,19 +3,19 @@ import path from "path"
 import Tool from "./Tool.mjs"
 
 const tool = new Tool()
+const SCRIPTS = 'scripts'
 // 用户的package.json
 class Pkg {
   constructor() {
     const dirPath = process.cwd() // 用户根路径
     this.path = path.join(dirPath, "package.json")
     this.dirPath = dirPath
-    // 添加一个私有变量来存储缓存
-    this._cache = null
+    this.SCRIPTS = SCRIPTS
   }
   // 私有方法，用于从文件系统中读取并解析package.json
   get() {
     const defaultInfo = {
-      scripts: {}
+      [SCRIPTS]: {}
     }
     // 读取并解析package.json，如果文件不存在或格式不正确，则写入默认值
     let info
@@ -27,7 +27,7 @@ class Pkg {
       }catch (e){
         info = defaultInfo
       }
-      if (!tool.isObject(info) || !tool.isObject(info.scripts)) {
+      if (!tool.isObject(info) || !tool.isObject(info[SCRIPTS])) {
         info = defaultInfo
       }
     }else{
@@ -37,13 +37,34 @@ class Pkg {
     // 返回解析后的info
     return info
   }
+  delete(key, isScript = false){
+    const info = this.get()
+    if(!isScript){
+      if(info[key] === undefined) {
+        // 内部错误
+        throw new Error('Internal Error: the key of ' + key + ' is not exists.')
+      }
+      delete info[key]
+    }else{
+      // 删除scripts中的键时
+      if(tool.isObject(info[SCRIPTS]) && info[SCRIPTS][key] !== undefined){
+        delete info[SCRIPTS][key]
+      }else{
+        throw new Error('Internal Error: the key of ' + key + ' is not exists.')
+      }
+    }
+
+    const filepath = this.path
+    return  tool.writeJSONFileSync(filepath, info)
+  }
   update(key, content) {
+    // console.log('userPkg update key:',key,", content:", content)
     // 不要提供全量更改
     const filepath = this.path
-    const info = this.get() // 这里会用到缓存，但如果key是'scripts'且需要合并，则缓存可能不是最新的
-    const SCRIPTS = "scripts"
-
+    const info = this.get()
+    // TODO 看看这里逻辑是不是有问题
     if (key === SCRIPTS) {
+      // console.log(info[SCRIPTS], content,'aaa')
       info[SCRIPTS] = { ...info[SCRIPTS], ...content }
     } else {
       info[key] = content

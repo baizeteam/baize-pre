@@ -5,6 +5,7 @@ import inquirer from "inquirer"
 import Mgr from "./Mgr.mjs"
 import Tool from "./Tool.mjs"
 import Pkg from "./Pkg.mjs"
+import fsExtra from "fs-extra";
 
 const tool = new Tool()
 const installStore = new InstallStore()
@@ -71,19 +72,22 @@ class Installer {
     }
   }
   #handleUninstall(pkgName) {
-    userPkg.get()
-    const { mgr } = this
-    let exec = mgr === "yarn" ? mgr + " remove " : mgr + " uninstall "
-    exec += pkgName
-    try {
-      // 捕获安装错误
-      tool.warn("Uninstalling " + pkgName + " ... ")
-      tool.execSync(exec)
-      tool.success("Uninstalled " + pkgName + " successfully. ")
-    } catch (e) {
-      tool.error("Error: uninstall " + pkgName + " : ")
-      console.log(e) // 承接上一行错误，但不要颜色打印
-    }
+    return new Promise((resolve, reject) => {
+      userPkg.get()
+      const { mgr } = this
+      let exec = mgr === "yarn" ? mgr + " remove " : mgr + " uninstall "
+      exec += pkgName
+      try {
+        // 捕获安装错误
+        tool.warn("Uninstalling " + pkgName + " ... ")
+        tool.execSync(exec)
+        tool.success("Uninstalled " + pkgName + " successfully. ")
+        resolve(true)
+      } catch (e) {
+        tool.error("Error: uninstall " + pkgName + " : ")
+        reject(e)
+      }
+    })
   }
   #handleConfig(config) {
     userPkg.get()
@@ -96,6 +100,7 @@ class Installer {
       // console.log(filepath,'filepath')
     } catch (e) {
       // console.log(filepath,'失败 filepath')
+      // 内部错误
       return tool.error("Internal Error: Configuration injection failed in handleConfig.")
     }
   }
@@ -136,10 +141,51 @@ class Installer {
     this.mgr = mgr.mgr
     // console.log(installs, 'uninstall')
     for(let item of installs){
-      const { plugin } = item
-      this.#handleInstall(plugin)
-      // 移除配置项
+      const { plugin, config, pkg } = item
+      this.#handleUninstall(plugin).then(async ()=>{
+        // 移除配置项
+        const {file} = config
+        const filepath = path.join(userPkg.dirPath, file)
+        if(!fs.existsSync(filepath)) return tool.error('"Error config path: ' + filepath)
+        // 删除配置文件
+        if(plugin === 'husky'){
+          const filepath = path.join(userPkg.dirPath, '.husky')
+          fsExtra.removeSync(filepath)
+        }else{
+          fsExtra.removeSync(filepath)
+        }
 
+        // 删除包信息配置
+        let info = userPkg.get()
+        for(let pkgKey in pkg){
+          if(info[pkgKey]){
+            const {SCRIPTS} = userPkg
+            // console.log(tool.isObject(pkg[pkgKey]), pkgKey, pkg, 'isObject')
+            if(pkgKey === SCRIPTS && tool.isObject(pkg[SCRIPTS])){ // 此时pkg[pkgKey] 等同于 pkg[SCRIPTS] 但后者语义好
+              for(let scriptKey in pkg[SCRIPTS]){
+                // SCRIPTS 里有这个键
+                if(info[SCRIPTS].hasOwnProperty(scriptKey)) {
+                  // console.log('SCRIPTS 里有这个键', scriptKey, info[SCRIPTS])
+                  // 多判断husky里携带的lint-staged
+                  if(plugin === 'husky'){
+                    const LINT = 'lint-staged'
+                    await this.#handleUninstall(LINT)
+                    userPkg.delete(LINT, true)
+                  }else{
+                    userPkg.delete(scriptKey,true)
+                  }
+                }
+              }
+            }else{
+              // console.log(info[pkgKey], 'other')
+              userPkg.delete(pkgKey)
+            }
+
+          }
+        }
+      }).catch(e=> {
+        console.log(e) // 承接上一行错误，但不要颜色打印
+      })
     }
   }
   async choose() {
