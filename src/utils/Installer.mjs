@@ -35,7 +35,7 @@ class Installer {
     if (!fs.existsSync(gitPath)) {
       //  最好用 'dev' 作为默认分支名
       //  master就算不是默认分支时，都是不可删的
-      tool.execSync("git init -b dev")
+      tool.execSync("git init")
       // 更改git默认不区分大小写的配置
       // 如果A文件已提交远程，再改为小写的a文件，引用a文件会出现本地正确、远程错误，因为远程还是大A文件)
       tool.execSync("git config core.ignorecase false")

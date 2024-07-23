@@ -8489,11 +8489,19 @@ function require_listCacheClear () {
  * // => true
  */
 
-function eq$1(value, other) {
-  return value === other || (value !== value && other !== other);
-}
+var eq_1;
+var hasRequiredEq;
 
-var eq_1 = eq$1;
+function requireEq () {
+	if (hasRequiredEq) return eq_1;
+	hasRequiredEq = 1;
+	function eq(value, other) {
+	  return value === other || (value !== value && other !== other);
+	}
+
+	eq_1 = eq;
+	return eq_1;
+}
 
 var _assocIndexOf;
 var hasRequired_assocIndexOf;
@@ -8501,7 +8509,7 @@ var hasRequired_assocIndexOf;
 function require_assocIndexOf () {
 	if (hasRequired_assocIndexOf) return _assocIndexOf;
 	hasRequired_assocIndexOf = 1;
-	var eq = eq_1;
+	var eq = requireEq();
 
 	/**
 	 * Gets the index at which the `key` is found in `array` of key-value pairs.
@@ -9314,7 +9322,7 @@ function baseAssignValue$1(object, key, value) {
 var _baseAssignValue = baseAssignValue$1;
 
 var baseAssignValue = _baseAssignValue,
-    eq = eq_1;
+    eq = requireEq();
 
 /** Used for built-in method references. */
 var objectProto$1 = Object.prototype;
@@ -18477,7 +18485,7 @@ var hasRequired_isIterateeCall;
 function require_isIterateeCall () {
 	if (hasRequired_isIterateeCall) return _isIterateeCall;
 	hasRequired_isIterateeCall = 1;
-	var eq = eq_1,
+	var eq = requireEq(),
 	    isArrayLike = requireIsArrayLike(),
 	    isIndex = _isIndex,
 	    isObject = isObject_1;
@@ -19071,7 +19079,7 @@ function requireDefaults$1 () {
 	if (hasRequiredDefaults$1) return defaults_1;
 	hasRequiredDefaults$1 = 1;
 	var baseRest = require_baseRest(),
-	    eq = eq_1,
+	    eq = requireEq(),
 	    isIterateeCall = require_isIterateeCall(),
 	    keysIn = requireKeysIn();
 
@@ -21219,7 +21227,7 @@ function require_equalByTag () {
 	hasRequired_equalByTag = 1;
 	var Symbol = _Symbol,
 	    Uint8Array = require_Uint8Array(),
-	    eq = eq_1,
+	    eq = requireEq(),
 	    equalArrays = require_equalArrays(),
 	    mapToArray = require_mapToArray(),
 	    setToArray = require_setToArray();
@@ -50034,7 +50042,7 @@ class Installer {
     if (!fs$j.existsSync(gitPath)) {
       //  最好用 'dev' 作为默认分支名
       //  master就算不是默认分支时，都是不可删的
-      tool$5.execSync("git init -b dev");
+      tool$5.execSync("git init");
       // 更改git默认不区分大小写的配置
       // 如果A文件已提交远程，再改为小写的a文件，引用a文件会出现本地正确、远程错误，因为远程还是大A文件)
       tool$5.execSync("git config core.ignorecase false");

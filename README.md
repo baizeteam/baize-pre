@@ -4,7 +4,7 @@
 支持渐进式无侵害接入旧项目;
 也可以一键生成新项目，包括安装插件, 并生成插件对应的配置文件，
 如tsconfig.json ,.husky/pre-commit, .prettierrc等。
-还会检测.git目录不存在，自动init dev并创建.gitignore文件,配置git config core.ignorecase false
+还会检测.git目录不存在，自动init master并创建.gitignore文件,配置git config core.ignorecase false
 
 ## 前言
 
@@ -20,7 +20,7 @@
 傻瓜式安装。（理论上所有项目规范一般都是统一的，也支持自定义配置插件的配置文件）
 
 ## 视频教程
-http://leaiv.cn/media/baize-pre/video.html
+http://media.leaiv.cn/baize-pre/video.html
 
 ## 优势
 
