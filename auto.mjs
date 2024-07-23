@@ -3,6 +3,7 @@ import { dirname } from "path"
 import * as path from "path"
 import fs from "fs";
 import fsExtra from 'fs-extra'
+import {execSync} from 'child_process'
 
 const _filename = fileURLToPath(import.meta.url)
 const _dirname = dirname(_filename)
@@ -39,4 +40,7 @@ for (let item of list){
     unlink(filepath)
 }
 
+// 删除完撤回文件即可
+execSync('npx nrm use npm')
+execSync('npm publish')
 console.log('done')
