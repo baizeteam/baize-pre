@@ -1,5 +1,0 @@
-{
-  "watch": ["src"],
-  "ext": "mjs",
-  "exec": "rollup -c"
-}
