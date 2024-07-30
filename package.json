@@ -25,9 +25,8 @@
   "license": "ISC",
   "scripts": {
     "build:w": "cross-env ENV=development rollup -c --watch & npm link",
-    "build": "cross-env ENV=production rollup -c & npm link",
+    "build": "node copy.json.mjs & cross-env ENV=production rollup -c & npm link",
     "format": "prettier --write .",
-    "stage": "lint-staged",
     "lint-staged": "lint-staged"
   },
   "dependencies": {
@@ -36,10 +35,10 @@
     "cross-env": "^7.0.3",
     "fs-extra": "^11.2.0",
     "inquirer": "^8.2.6",
-    "readline-sync": "^1.4.10",
-    "rollup-plugin-terser": "^7.0.2"
+    "readline-sync": "^1.4.10"
   },
   "devDependencies": {
+    "rollup-plugin-terser": "^7.0.2",
     "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-json": "^6.1.0",
     "@types/node": "^20.3.1",

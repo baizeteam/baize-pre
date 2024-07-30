@@ -26,7 +26,7 @@
       "name": "husky",
       "config": {
         "file": ".husky/pre-commit",
-        "json": " #!/usr/bin/env sh \n . \"$(dirname -- \"$0\")/_/husky.sh\" \n npm run lint-staged "
+        "json": " #!/usr/bin/env sh \n. \"$(dirname -- \"$0\")/_/husky.sh\" \nnpm run lint-staged "
       },
       "dev": true,
       "pkgInject": {
@@ -43,16 +43,24 @@
       "config": {
         "file": "tsconfig.json",
         "json": {
+
           "compilerOptions": {
             "target": "es6",
             "outDir": "bin",
             "module": "esnext",
             "esModuleInterop": true,
             "moduleResolution": "node",
-            "rootDir": "src"
+            "rootDir": "src",
+            "sourceMap": true,
+            "importHelpers": true,
+            "paths": {
+              "@/*": ["src/*"]
+            },
+            "baseUrl": "./"
           },
           "include": ["src"],
           "exclude": ["node_modules"]
+
         }
       },
       "dev": true,
