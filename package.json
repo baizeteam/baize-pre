@@ -25,7 +25,7 @@
   "license": "ISC",
   "scripts": {
     "build:w": "cross-env ENV=development rollup -c --watch & npm link",
-    "build": "node copy.json.mjs & cross-env ENV=production rollup -c & npm link",
+    "build": "node copy.json.mjs & cross-env ENV=production rollup -c",
     "format": "prettier --write .",
     "lint-staged": "lint-staged"
   },
