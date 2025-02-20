@@ -1,6 +1,6 @@
 {
   "name": "baize-pre",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "A useful progressive front-end normalization tool.",
   "bin": {
     "baize": "/bin/main.js"
