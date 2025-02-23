@@ -1,6 +1,6 @@
 {
   "name": "baize-pre",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "A useful progressive front-end normalization tool.",
   "bin": {
     "baize": "/bin/main.js"
@@ -37,7 +37,8 @@
     "fs-extra": "^11.2.0",
     "inquirer": "^8.2.6",
     "readline-sync": "^1.4.10",
-    "simple-git": "^3.27.0"
+    "simple-git": "^3.27.0",
+    "source-map-support": "^0.5.21"
   },
   "devDependencies": {
     "@rollup/plugin-alias": "^5.1.0",
@@ -55,7 +56,6 @@
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.36.0",
-    "source-map-support": "^0.5.21",
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
