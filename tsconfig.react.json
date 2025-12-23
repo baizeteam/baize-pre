@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                          // 编译目标（兼容主流浏览器）
+    "module": "ESNext",                          // 模块系统
+    "moduleResolution": "Node",                  // Node模块解析
+    "strict": true,                              // 严格类型检查
+    "jsx": "react-jsx",                          // React 17+ 新JSX转换（无需引入React）
+    "sourceMap": true,                           // 生成sourceMap
+    "resolveJsonModule": true,                   // 允许导入JSON
+    "esModuleInterop": true,                     // 兼容CommonJS
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],    // 引入ES和DOM类型
+    "types": ["node", "jest"],                   // 全局类型（Node/Jest）
+    "baseUrl": ".",                              // 基础路径
+    "paths": {                                   // 路径别名
+      "@/*": ["src/*"],
+      "@/components/*": ["src/components/*"],
+      "@/utils/*": ["src/utils/*"]
+    },
+    "skipLibCheck": true,                        // 跳过第三方库类型检查
+    "forceConsistentCasingInFileNames": true,    // 文件名大小写一致
+    "noImplicitAny": true,                       // 禁止隐式any类型
+    "noImplicitReturns": true,                   // 强制函数返回值明确
+    "noFallthroughCasesInSwitch": true,          // 禁止switch穿透（无break）
+    "allowSyntheticDefaultImports": true,        // 允许合成默认导入
+    "noEmit": true                               // 仅类型检查，由Webpack/ts-loader处理编译
+  },
+  "include": [                                   // 检查范围
+    "src/**/*.ts", 
+    "src/**/*.d.ts", 
+    "src/**/*.tsx",
+    "config/**/*.ts",
+    "mock/**/*.ts"
+  ],
+  "exclude": [                                   // 排除范围
+    "node_modules", 
+    "dist", 
+    "build",
+    "scripts/**/*.js"
+  ]
+}

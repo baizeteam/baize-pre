@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "target": "ESNext", // 编译目标为最新ES标准
+    "module": "ES2022", // 模块系统为ES2022，适配Vite，支持import.meta
+    "moduleResolution": "bundler", // 模块解析使用bundler模式，支持import.meta
+    "strict": true, // 开启严格类型检查（核心）
+    "jsx": "preserve", // 保留JSX（若使用JSX语法）
+    "sourceMap": true, // 生成sourceMap，便于调试
+    "resolveJsonModule": true, // 允许导入JSON文件
+    "esModuleInterop": true, // 兼容CommonJS模块导入
+    "lib": ["ESNext", "DOM"], // 引入ES和DOM类型库
+    "types": ["vite/client"], // 声明全局类型（Vite）
+    "baseUrl": ".", // 基础路径
+    "paths": {
+      // 路径别名（匹配项目src别名）
+      "@/*": ["src/*"]
+    },
+    "skipLibCheck": true, // 跳过第三方库的类型检查（提速）
+    "forceConsistentCasingInFileNames": true, // 强制文件名大小写一致
+    "isolatedModules": true, // 强制每个文件为独立模块（适配Vite）
+    "noEmit": true // 仅类型检查，不生成编译文件（由构建工具处理）
+  },
+  "include": [
+    // 需要TS检查的文件范围
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "src/env.d.ts",
+    "typings/**/*.d.ts",
+    "src/env.d.ts",
+    "src/shims-vue.d.ts"
+  ],
+  "exclude": [
+    // 排除检查的文件
+    "node_modules",
+    "dist",
+    "**/*.js"
+  ],
+  "vueCompilerOptions": {
+    // Vue专属编译选项（配合vue-tsc）
+    "target": 3, // 适配Vue 3
+    "experimentalDisableTemplateSupport": false // 启用模板类型检查
+  }
+}

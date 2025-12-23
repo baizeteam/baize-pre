@@ -1,22 +1,23 @@
-import fsExtra from "fs-extra";
-import { execSync } from "child_process";
-import { ToolInstance } from "@/instance/tool.instance";
+import type { ToolInstance } from '@/types/tool.interface'
+import { execSync } from 'node:child_process'
+import fsExtra from 'fs-extra'
 
 class ToolService implements ToolInstance {
-  isObject(obj: any): boolean {
-    return Object.prototype.toString.call(obj) === "[object Object]";
+  isObject(obj: object): boolean {
+    return Object.prototype.toString.call(obj) === '[object Object]'
   }
 
-  formatJSON(content: any) {
-    return JSON.stringify(content, null, 2);
+  formatJSON(content: object) {
+    return JSON.stringify(content, null, 2)
   }
-  writeJSONFileSync(path: string, content: any): void {
-    fsExtra.writeFileSync(path, this.formatJSON(content));
+
+  writeJSONFileSync(path: string, content: object): void {
+    fsExtra.writeFileSync(path, this.formatJSON(content))
   }
 
   execSync(exec: string): void {
-    execSync(exec, { stdio: "inherit" });
+    execSync(exec, { stdio: 'inherit' })
   }
 }
 
-export const toolService: ToolInstance = new ToolService();
+export const toolService: ToolInstance = new ToolService()

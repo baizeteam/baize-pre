@@ -1,10 +1,12 @@
 {
+  "semi": false,
+  "trailingComma": "es5",
+  "singleQuote": true,
   "printWidth": 80,
   "tabWidth": 2,
   "useTabs": false,
-  "singleQuote": false,
-  "semi": true,
-  "trailingComma": "none",
   "bracketSpacing": true,
-  "htmlWhitespaceSensitivity": "ignore"
+  "arrowParens": "avoid",
+  "endOfLine": "lf",
+  "vueIndentScriptAndStyle": false
 }

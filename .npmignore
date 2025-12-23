@@ -1,0 +1,37 @@
+# 源码文件（不需要发布）
+src/
+scripts/
+rollup.config.mjs
+tsconfig.json
+eslint.config.js
+lint-staged.config.mjs
+commitlint.config.cjs
+.prettierrc
+
+# 开发依赖
+node_modules/
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# 测试文件
+test-project/
+*.test.js
+*.test.ts
+__tests__/
+
+# 开发工具
+.husky/
+.github/
+.vscode/
+.idea/
+.gitignore
+
+# 临时文件
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# 构建产物（只保留 dist 目录）
+# dist/ 会被包含在发布包中
